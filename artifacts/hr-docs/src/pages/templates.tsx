@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
+import mammoth from "mammoth";
 import { Layout } from "@/components/layout";
 import { Card } from "@/components/ui/card";
 import { useGetTemplates } from "@workspace/api-client-react";
-import { LayoutTemplate, FileText, Settings, ArrowRight, Upload, Plus, X, Trash2, Loader2, FileUp } from "lucide-react";
+import { LayoutTemplate, FileText, Settings, ArrowRight, Upload, Plus, Trash2, Loader2, FileUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,18 +50,42 @@ function ImportDialog({ open, onClose, onCreated }: ImportDialogProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const text = ev.target?.result as string;
-      setContent(text);
-      setDetectedFields(detectFields(text));
-      if (!name) setName(file.name.replace(/\.[^.]+$/, ""));
-      setStep("edit");
-    };
-    reader.readAsText(file, "UTF-8");
+
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    const baseName = file.name.replace(/\.[^.]+$/, "");
+
+    if (ext === "docx" || ext === "doc") {
+      setLoading(true);
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        const text = result.value;
+        setContent(text);
+        setDetectedFields(detectFields(text));
+        if (!name) setName(baseName);
+        setStep("edit");
+        if (result.messages.length > 0) {
+          toast({ title: "Файл прочитан с предупреждениями", description: "Часть форматирования могла быть потеряна при конвертации." });
+        }
+      } catch {
+        toast({ title: "Ошибка чтения файла", description: "Не удалось прочитать .docx файл. Попробуйте сохранить как .txt.", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        setContent(text);
+        setDetectedFields(detectFields(text));
+        if (!name) setName(baseName);
+        setStep("edit");
+      };
+      reader.readAsText(file, "UTF-8");
+    }
   };
 
   const handleManual = () => {
@@ -116,7 +141,7 @@ function ImportDialog({ open, onClose, onCreated }: ImportDialogProps) {
           </DialogTitle>
           <DialogDescription>
             {step === "upload"
-              ? "Загрузите файл .txt с текстом документа или создайте шаблон вручную. Используйте {{поле}} для обозначения заполняемых полей."
+              ? "Загрузите файл .docx, .doc или .txt с текстом документа, либо создайте шаблон вручную. Используйте {{поле}} для обозначения заполняемых полей."
               : "Проверьте содержимое и заполните параметры нового шаблона."}
           </DialogDescription>
         </DialogHeader>
@@ -124,13 +149,19 @@ function ImportDialog({ open, onClose, onCreated }: ImportDialogProps) {
         {step === "upload" ? (
           <div className="space-y-4 py-2">
             <div
-              className="border-2 border-dashed border-border/60 rounded-xl p-10 text-center hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
-              onClick={() => fileRef.current?.click()}
+              className={`border-2 border-dashed border-border/60 rounded-xl p-10 text-center transition-all ${loading ? "opacity-60 cursor-not-allowed" : "hover:border-primary/40 hover:bg-primary/5 cursor-pointer group"}`}
+              onClick={() => !loading && fileRef.current?.click()}
             >
-              <Upload className="w-10 h-10 text-muted-foreground/60 group-hover:text-primary/70 mx-auto mb-3 transition-colors" />
-              <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">Нажмите для выбора .txt файла</p>
-              <p className="text-xs text-muted-foreground/60 mt-1">Поддерживаются текстовые файлы (.txt)</p>
-              <input ref={fileRef} type="file" accept=".txt,text/plain" className="hidden" onChange={handleFileChange} />
+              {loading ? (
+                <Loader2 className="w-10 h-10 text-primary/70 mx-auto mb-3 animate-spin" />
+              ) : (
+                <Upload className="w-10 h-10 text-muted-foreground/60 group-hover:text-primary/70 mx-auto mb-3 transition-colors" />
+              )}
+              <p className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                {loading ? "Читаю документ..." : "Нажмите для выбора файла"}
+              </p>
+              <p className="text-xs text-muted-foreground/60 mt-1">Поддерживаются форматы: .docx, .doc, .txt</p>
+              <input ref={fileRef} type="file" accept=".docx,.doc,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,text/plain" className="hidden" onChange={handleFileChange} disabled={loading} />
             </div>
             <div className="relative flex items-center">
               <div className="flex-1 border-t border-border/40" />
