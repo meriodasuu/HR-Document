@@ -1,0 +1,15 @@
+packages:
+  "recharts": "For dashboard statistical charts"
+  "@hookform/resolvers": "For Zod form validation in modals"
+  "date-fns": "For formatting and parsing dates nicely"
+  "clsx": "For class name merging"
+  "tailwind-merge": "For class name merging"
+
+images:
+  - path: "artifacts/hr-docs/public/images/logo.png"
+    description: "Minimalist, professional corporate geometric logo for an HR system, blue color palette, transparent background, clean lines"
+    aspect_ratio: "1:1"
+
+notes:
+  - Using generated React Query hooks from @workspace/api-client-react
+  - wouter is used for routing

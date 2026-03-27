@@ -1,22 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: HR Document Automation API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: employees
+    description: Employee management
+  - name: documents
+    description: Document management
+  - name: templates
+    description: Document templates
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +28,226 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /employees:
+    get:
+      operationId: getEmployees
+      tags: [employees]
+      summary: Get all employees
+      responses:
+        "200":
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
+    post:
+      operationId: createEmployee
+      tags: [employees]
+      summary: Create employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployee"
+      responses:
+        "201":
+          description: Created employee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+
+  /employees/{id}:
+    get:
+      operationId: getEmployee
+      tags: [employees]
+      summary: Get employee by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Employee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+    put:
+      operationId: updateEmployee
+      tags: [employees]
+      summary: Update employee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployee"
+      responses:
+        "200":
+          description: Updated employee
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+    delete:
+      operationId: deleteEmployee
+      tags: [employees]
+      summary: Delete employee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResponse"
+
+  /documents:
+    get:
+      operationId: getDocuments
+      tags: [documents]
+      summary: Get all documents
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: employeeId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+    post:
+      operationId: createDocument
+      tags: [documents]
+      summary: Create document from template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDocument"
+      responses:
+        "201":
+          description: Created document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      tags: [documents]
+      summary: Get document by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+    delete:
+      operationId: deleteDocument
+      tags: [documents]
+      summary: Delete document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResponse"
+
+  /documents/{id}/sign:
+    post:
+      operationId: signDocument
+      tags: [documents]
+      summary: Sign/approve document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Signed document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+
+  /templates:
+    get:
+      operationId: getTemplates
+      tags: [templates]
+      summary: Get all document templates
+      responses:
+        "200":
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Template"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [documents]
+      summary: Get document statistics
+      responses:
+        "200":
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +258,193 @@ components:
       required:
         - status
 
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        fullName:
+          type: string
+        position:
+          type: string
+        department:
+          type: string
+        employeeNumber:
+          type: string
+        hireDate:
+          type: string
+        salary:
+          type: number
+        phone:
+          type: string
+        email:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - fullName
+        - position
+        - department
+        - employeeNumber
+        - hireDate
+
+    CreateEmployee:
+      type: object
+      properties:
+        fullName:
+          type: string
+        position:
+          type: string
+        department:
+          type: string
+        employeeNumber:
+          type: string
+        hireDate:
+          type: string
+        salary:
+          type: number
+        phone:
+          type: string
+        email:
+          type: string
+      required:
+        - fullName
+        - position
+        - department
+        - employeeNumber
+        - hireDate
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+          enum: [draft, signed, printed]
+        employeeId:
+          type: integer
+        employeeName:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+        signedAt:
+          type: string
+        templateId:
+          type: integer
+      required:
+        - id
+        - number
+        - type
+        - title
+        - status
+        - employeeId
+        - employeeName
+        - content
+        - createdAt
+
+    CreateDocument:
+      type: object
+      properties:
+        templateId:
+          type: integer
+        employeeId:
+          type: integer
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - templateId
+        - employeeId
+        - fields
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateField"
+        content:
+          type: string
+      required:
+        - id
+        - name
+        - type
+        - description
+        - fields
+        - content
+
+    TemplateField:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum: [text, date, number, select]
+        required:
+          type: boolean
+        options:
+          type: array
+          items:
+            type: string
+      required:
+        - key
+        - label
+        - type
+        - required
+
+    Stats:
+      type: object
+      properties:
+        totalDocuments:
+          type: integer
+        draftDocuments:
+          type: integer
+        signedDocuments:
+          type: integer
+        printedDocuments:
+          type: integer
+        totalEmployees:
+          type: integer
+        documentsThisMonth:
+          type: integer
+      required:
+        - totalDocuments
+        - draftDocuments
+        - signedDocuments
+        - printedDocuments
+        - totalEmployees
+        - documentsThisMonth
+
+    DeleteResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
