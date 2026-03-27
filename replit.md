@@ -48,6 +48,14 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
+## HR Document Automation System (artifacts/hr-docs)
+
+React + Vite frontend. Key features:
+- **Auth**: Login required (hr / hr2024). Token stored in localStorage, sent as Bearer header. Backend sessions in-memory. Logout via sidebar footer.
+- **Templates**: 6 built-in static templates + custom templates stored in `custom_templates` DB table. Import from .txt file or create manually, auto-detects `{{placeholder}}` fields.
+- **Documents**: Full CRUD, sign/print workflow.
+- **Employees**: Full CRUD.
+
 ## Packages
 
 ### `artifacts/api-server` (`@workspace/api-server`)

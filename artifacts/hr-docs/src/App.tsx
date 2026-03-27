@@ -1,16 +1,17 @@
+import { useState, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-
-// Pages
+import Login from "@/pages/login";
 import Dashboard from "./pages/dashboard";
 import Employees from "./pages/employees";
 import Documents from "./pages/documents";
 import CreateDocument from "./pages/create-document";
 import DocumentView from "./pages/document-view";
 import Templates from "./pages/templates";
+import { isAuthenticated } from "@/lib/auth";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +37,34 @@ function Router() {
 }
 
 function App() {
+  const [authed, setAuthed] = useState<boolean>(isAuthenticated());
+
+  useEffect(() => {
+    setAuthed(isAuthenticated());
+    const handler = () => { setAuthed(false); queryClient.clear(); };
+    window.addEventListener("hr-logout", handler);
+    return () => window.removeEventListener("hr-logout", handler);
+  }, []);
+
+  const handleLogin = () => {
+    setAuthed(true);
+    queryClient.clear();
+  };
+
+  const handleLogout = () => {
+    setAuthed(false);
+    queryClient.clear();
+  };
+
+  if (!authed) {
+    return (
+      <>
+        <Login onLogin={handleLogin} />
+        <Toaster />
+      </>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

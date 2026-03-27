@@ -8,7 +8,8 @@ import {
   SignDocumentParams,
   GetDocumentsQueryParams,
 } from "@workspace/api-zod";
-import { TEMPLATES } from "./templates";
+import { STATIC_TEMPLATES } from "./templates";
+import { customTemplatesTable } from "@workspace/db";
 
 const router: IRouter = Router();
 
@@ -71,7 +72,16 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const body = CreateDocumentBody.parse(req.body);
 
-  const template = TEMPLATES.find((t) => t.id === body.templateId);
+  let template: { name: string; type: string; content: string } | undefined;
+
+  if (body.templateId > 1000) {
+    const dbId = body.templateId - 1000;
+    const [row] = await db.select().from(customTemplatesTable).where(eq(customTemplatesTable.id, dbId));
+    if (row) template = { name: row.name, type: row.type, content: row.content };
+  } else {
+    template = STATIC_TEMPLATES.find((t) => t.id === body.templateId);
+  }
+
   if (!template) return res.status(400).json({ error: "Template not found" });
 
   const [employee] = await db.select().from(employeesTable).where(eq(employeesTable.id, body.employeeId));

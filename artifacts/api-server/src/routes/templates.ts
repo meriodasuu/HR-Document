@@ -1,13 +1,16 @@
 import { Router, type IRouter } from "express";
+import { db, customTemplatesTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 const router: IRouter = Router();
 
-export const TEMPLATES = [
+export const STATIC_TEMPLATES = [
   {
     id: 1,
     name: "Приказ о приёме на работу",
     type: "order_hire",
     description: "Оформление приёма нового сотрудника на работу (форма Т-1)",
+    isCustom: false,
     fields: [
       { key: "orderNumber", label: "Номер приказа", type: "text", required: true },
       { key: "orderDate", label: "Дата приказа", type: "date", required: true },
@@ -33,6 +36,7 @@ export const TEMPLATES = [
     name: "Приказ об увольнении",
     type: "order_dismiss",
     description: "Оформление увольнения сотрудника (форма Т-8)",
+    isCustom: false,
     fields: [
       { key: "orderNumber", label: "Номер приказа", type: "text", required: true },
       { key: "orderDate", label: "Дата приказа", type: "date", required: true },
@@ -58,6 +62,7 @@ export const TEMPLATES = [
     name: "Трудовой договор",
     type: "contract",
     description: "Заключение трудового договора с сотрудником",
+    isCustom: false,
     fields: [
       { key: "contractNumber", label: "Номер договора", type: "text", required: true },
       { key: "contractDate", label: "Дата договора", type: "date", required: true },
@@ -94,6 +99,7 @@ export const TEMPLATES = [
     name: "Приказ о переводе",
     type: "order_transfer",
     description: "Оформление перевода сотрудника на другую должность или в другой отдел",
+    isCustom: false,
     fields: [
       { key: "orderNumber", label: "Номер приказа", type: "text", required: true },
       { key: "orderDate", label: "Дата приказа", type: "date", required: true },
@@ -123,6 +129,7 @@ export const TEMPLATES = [
     name: "Приказ об отпуске",
     type: "order_vacation",
     description: "Оформление ежегодного оплачиваемого отпуска (форма Т-6)",
+    isCustom: false,
     fields: [
       { key: "orderNumber", label: "Номер приказа", type: "text", required: true },
       { key: "orderDate", label: "Дата приказа", type: "date", required: true },
@@ -149,6 +156,7 @@ export const TEMPLATES = [
     name: "Акт выполненных работ",
     type: "act",
     description: "Акт о выполнении работ или оказании услуг",
+    isCustom: false,
     fields: [
       { key: "actNumber", label: "Номер акта", type: "text", required: true },
       { key: "actDate", label: "Дата акта", type: "date", required: true },
@@ -178,9 +186,69 @@ export const TEMPLATES = [
   },
 ];
 
-router.get("/", (_req, res) => {
-  const templatesWithoutContent = TEMPLATES.map(({ content, ...t }) => ({ ...t, content }));
-  res.json(templatesWithoutContent);
+router.get("/", async (_req, res) => {
+  const customRows = await db.select().from(customTemplatesTable).orderBy(customTemplatesTable.createdAt);
+  const custom = customRows.map((r) => ({
+    id: r.id + 1000,
+    name: r.name,
+    type: r.type,
+    description: r.description,
+    fields: r.fields as any[],
+    content: r.content,
+    isCustom: true,
+    createdAt: r.createdAt.toISOString(),
+  }));
+  res.json([...STATIC_TEMPLATES, ...custom]);
+});
+
+router.post("/", async (req, res) => {
+  const { name, description, content } = req.body ?? {};
+  if (!name || !content) {
+    return res.status(400).json({ error: "Укажите название и содержимое шаблона" });
+  }
+
+  // Auto-detect {{placeholder}} fields from content
+  const placeholderRegex = /\{\{(\w+)\}\}/g;
+  const found = new Set<string>();
+  let m;
+  while ((m = placeholderRegex.exec(content)) !== null) {
+    const key = m[1];
+    if (!["employeeName", "position", "department"].includes(key)) {
+      found.add(key);
+    }
+  }
+
+  const fields = Array.from(found).map((key) => ({
+    key,
+    label: key,
+    type: "text",
+    required: true,
+  }));
+
+  const [row] = await db
+    .insert(customTemplatesTable)
+    .values({ name, type: "custom", description: description ?? "", fields, content })
+    .returning();
+
+  res.status(201).json({
+    id: row.id + 1000,
+    name: row.name,
+    type: row.type,
+    description: row.description,
+    fields: row.fields,
+    content: row.content,
+    isCustom: true,
+    createdAt: row.createdAt.toISOString(),
+  });
+});
+
+router.delete("/:id", async (req, res) => {
+  const dbId = Number(req.params.id) - 1000;
+  if (dbId < 1) {
+    return res.status(400).json({ error: "Нельзя удалить встроенный шаблон" });
+  }
+  await db.delete(customTemplatesTable).where(eq(customTemplatesTable.id, dbId));
+  res.json({ success: true, message: "Шаблон удалён" });
 });
 
 export default router;

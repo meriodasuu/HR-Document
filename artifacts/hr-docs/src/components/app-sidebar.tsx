@@ -4,7 +4,8 @@ import {
   Files, 
   FilePlus, 
   LayoutTemplate,
-  ShieldAlert
+  ShieldCheck,
+  LogOut,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
@@ -17,7 +18,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { logout, getUser } from "@/lib/auth";
 
 const mainItems = [
   { title: "Главная", url: "/", icon: Home },
@@ -27,14 +31,24 @@ const mainItems = [
   { title: "Шаблоны", url: "/templates", icon: LayoutTemplate },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onLogout?: () => void;
+}
+
+export function AppSidebar({ onLogout }: AppSidebarProps) {
   const [location] = useLocation();
+  const username = getUser() ?? "hr";
+
+  const handleLogout = async () => {
+    await logout();
+    window.dispatchEvent(new Event("hr-logout"));
+  };
 
   return (
     <Sidebar className="border-r border-border/50 bg-sidebar">
       <SidebarHeader className="p-4 flex flex-row items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
-          <ShieldAlert className="w-5 h-5 text-primary" />
+          <ShieldCheck className="w-5 h-5 text-primary" />
         </div>
         <div className="flex flex-col">
           <span className="font-bold text-sm tracking-tight text-foreground leading-tight">HR Docs</span>
@@ -77,6 +91,27 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-4 border-t border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+            <span className="text-xs font-bold text-primary uppercase">{username.slice(0, 2)}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground truncate">{username}</p>
+            <p className="text-xs text-muted-foreground">HR-сотрудник</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            onClick={handleLogout}
+            title="Выйти"
+          >
+            <LogOut className="w-4 h-4" />
+          </Button>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
