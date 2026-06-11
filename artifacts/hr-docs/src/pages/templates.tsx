@@ -20,7 +20,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { apiFetch } from "@/lib/auth";
+import { apiFetch, getRole } from "@/lib/auth";
 
 
 function detectFields(content: string): string[] {
@@ -232,6 +232,18 @@ export default function Templates() {
   const [importOpen, setImportOpen] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
   const { toast } = useToast();
+  const role = getRole();
+
+  if (role !== "hr") {
+    return (
+      <Layout>
+        <div className="py-20 text-center space-y-4">
+          <h1 className="text-2xl font-bold text-foreground">Недостаточно прав</h1>
+          <p className="text-muted-foreground">Шаблонами документов управляет HR-сотрудник.</p>
+        </div>
+      </Layout>
+    );
+  }
 
   const handleDelete = async (id: number) => {
     setDeleting(id);

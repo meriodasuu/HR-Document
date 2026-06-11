@@ -37,11 +37,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getRole } from "@/lib/auth";
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'draft':
       return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm">Черновик</Badge>;
+    case 'pending_signature':
+      return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 shadow-sm">На подписи</Badge>;
     case 'signed':
       return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 shadow-sm">Подписан</Badge>;
     case 'printed':
@@ -57,6 +60,7 @@ export default function Documents() {
   const { data: documents, isLoading } = useGetDocuments();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const role = getRole();
 
   const deleteMutation = useDeleteDocument({
     mutation: {
@@ -90,12 +94,14 @@ export default function Documents() {
             <p className="text-muted-foreground mt-1">Архив приказов, договоров и актов</p>
           </div>
           
-          <Button asChild className="shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover-elevate">
-            <Link href="/documents/new">
-              <Plus className="w-4 h-4 mr-2" />
-              Создать документ
-            </Link>
-          </Button>
+          {role === "hr" && (
+            <Button asChild className="shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover-elevate">
+              <Link href="/documents/new">
+                <Plus className="w-4 h-4 mr-2" />
+                Создать документ
+              </Link>
+            </Button>
+          )}
         </div>
 
         <Card className="border border-border/50 shadow-sm bg-card/80 backdrop-blur-sm">
@@ -118,6 +124,7 @@ export default function Documents() {
                 <SelectContent>
                   <SelectItem value="all">Все статусы</SelectItem>
                   <SelectItem value="draft">Черновики</SelectItem>
+                  <SelectItem value="pending_signature">На подписи</SelectItem>
                   <SelectItem value="signed">Подписанные</SelectItem>
                   <SelectItem value="printed">Напечатанные</SelectItem>
                 </SelectContent>
@@ -169,12 +176,13 @@ export default function Documents() {
                         {formatDate(doc.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-2">
                           <Button asChild variant="outline" size="sm" className="h-8 hover-elevate bg-background border-border/50">
                             <Link href={`/documents/${doc.id}`}>
                               <Eye className="w-3.5 h-3.5 mr-1.5 text-primary" /> Открыть
                             </Link>
                           </Button>
+                          {role === "hr" && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10 hover-elevate">
@@ -199,6 +207,7 @@ export default function Documents() {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
+                          )}
                         </div>
                       </td>
                     </tr>

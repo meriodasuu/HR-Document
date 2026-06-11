@@ -60,13 +60,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { getRole } from "@/lib/auth";
+
+const MIN_DATE = "1900-01-01";
+const MAX_DATE = "2100-12-31";
+
+function isDateInAllowedRange(value: string) {
+  return value >= MIN_DATE && value <= MAX_DATE;
+}
 
 const employeeSchema = z.object({
   fullName: z.string().min(2, "Введите ФИО"),
   position: z.string().min(2, "Введите должность"),
   department: z.string().min(2, "Введите отдел"),
   employeeNumber: z.string().min(1, "Табельный номер обязателен"),
-  hireDate: z.string().min(10, "Выберите дату"),
+  hireDate: z.string().min(10, "Выберите дату").refine(isDateInAllowedRange, "Дата должна быть в диапазоне 1900-2100"),
   salary: z.coerce.number().optional(),
   phone: z.string().optional(),
   email: z.string().email("Неверный email").optional().or(z.literal("")),
@@ -78,6 +86,7 @@ export default function Employees() {
   const { data: employees, isLoading } = useGetEmployees();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const role = getRole();
   
   const [search, setSearch] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -178,6 +187,17 @@ export default function Employees() {
     emp.position.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
+  if (role !== "hr") {
+    return (
+      <Layout>
+        <div className="py-20 text-center space-y-4">
+          <h1 className="text-2xl font-bold text-foreground">Недостаточно прав</h1>
+          <p className="text-muted-foreground">Управление сотрудниками доступно только HR-сотруднику.</p>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -240,7 +260,7 @@ export default function Employees() {
                     <FormField control={form.control} name="hireDate" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Дата приёма</FormLabel>
-                        <FormControl><Input type="date" {...field} className="bg-secondary/30" /></FormControl>
+                        <FormControl><Input type="date" min={MIN_DATE} max={MAX_DATE} {...field} className="bg-secondary/30" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />

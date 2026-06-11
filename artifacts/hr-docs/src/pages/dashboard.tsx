@@ -17,11 +17,14 @@ import { Link } from "wouter";
 import { formatDate } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { getRole } from "@/lib/auth";
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'draft':
       return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Черновик</Badge>;
+    case 'pending_signature':
+      return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">На подписи</Badge>;
     case 'signed':
       return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Подписан</Badge>;
     case 'printed':
@@ -34,6 +37,7 @@ function StatusBadge({ status }: { status: string }) {
 export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useGetStats();
   const { data: docs, isLoading: docsLoading } = useGetDocuments();
+  const role = getRole();
 
   const recentDocs = docs?.slice(0, 5) || [];
 
@@ -48,18 +52,22 @@ export default function Dashboard() {
             <p className="text-muted-foreground mt-1 text-sm">Оперативная сводка по документам и сотрудникам</p>
           </div>
           <div className="flex gap-3">
-            <Button asChild variant="outline" className="bg-background shadow-sm hover:bg-secondary/80 hover-elevate transition-all">
-              <Link href="/employees">
-                <Users className="w-4 h-4 mr-2 text-primary" />
-                Сотрудники
-              </Link>
-            </Button>
-            <Button asChild className="shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover-elevate transition-all">
-              <Link href="/documents/new">
-                <Plus className="w-4 h-4 mr-2" />
-                Создать документ
-              </Link>
-            </Button>
+            {role === "hr" && (
+              <>
+                <Button asChild variant="outline" className="bg-background shadow-sm hover:bg-secondary/80 hover-elevate transition-all">
+                  <Link href="/employees">
+                    <Users className="w-4 h-4 mr-2 text-primary" />
+                    Сотрудники
+                  </Link>
+                </Button>
+                <Button asChild className="shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 hover-elevate transition-all">
+                  <Link href="/documents/new">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Создать документ
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
 

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useGetTemplates, useGetEmployees, useCreateDocument } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { 
   FilePlus, 
   ArrowRight, 
@@ -16,6 +16,7 @@ import {
   UserCheck
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getRole } from "@/lib/auth";
 import {
   Select,
   SelectContent,
@@ -24,6 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const MIN_DATE = "1900-01-01";
+const MAX_DATE = "2100-12-31";
 
 export default function CreateDocument() {
   const [step, setStep] = useState(1);
@@ -37,6 +41,7 @@ export default function CreateDocument() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const role = getRole();
 
   const createMutation = useCreateDocument({
     mutation: {
@@ -69,6 +74,20 @@ export default function CreateDocument() {
 
   const isStep2Valid = selectedEmployeeId !== null;
   const isStep3Valid = selectedTemplate?.fields.every(f => !f.required || (fields[f.key] && fields[f.key].trim() !== "")) ?? false;
+
+  if (role !== "hr") {
+    return (
+      <Layout>
+        <div className="py-20 text-center space-y-4">
+          <h1 className="text-2xl font-bold text-foreground">Недостаточно прав</h1>
+          <p className="text-muted-foreground">Создавать документы может только HR-сотрудник.</p>
+          <Button asChild variant="outline">
+            <Link href="/documents">Вернуться к документам</Link>
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -224,6 +243,8 @@ export default function CreateDocument() {
                             placeholder={`Введите ${field.label.toLowerCase()}`}
                             value={fields[field.key] || ""}
                             onChange={(e) => setFields({...fields, [field.key]: e.target.value})}
+                            min={field.type === "date" ? MIN_DATE : undefined}
+                            max={field.type === "date" ? MAX_DATE : undefined}
                             className="bg-background"
                           />
                         )}

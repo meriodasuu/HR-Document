@@ -1,7 +1,10 @@
 import { Layout } from "@/components/layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useGetDocument, useSignDocument } from "@workspace/api-client-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState, type ChangeEvent } from "react";
+import { useGetDocument } from "@workspace/api-client-react";
 import { useRoute, Link } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { 
@@ -11,17 +14,26 @@ import {
   Calendar,
   User,
   Hash,
-  Download
+  Send,
+  Upload,
+  X
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { apiFetch, getRole } from "@/lib/auth";
+
+const SIGNATURE_IMAGE_KEY = "director_signature_image";
+const SIGNATURE_NAME_KEY = "director_signature_name";
+const DEFAULT_SIGNATURE_NAME = "Директор";
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'draft':
       return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-sm py-1 px-3">Черновик</Badge>;
+    case 'pending_signature':
+      return <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300 text-sm py-1 px-3">На подписи</Badge>;
     case 'signed':
       return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 text-sm py-1 px-3">Подписан</Badge>;
     case 'printed':
@@ -38,22 +50,73 @@ export default function DocumentView() {
   const { data: doc, isLoading } = useGetDocument(id);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const role = getRole();
+  const [actionLoading, setActionLoading] = useState(false);
+  const [signatureImage, setSignatureImage] = useState(() => localStorage.getItem(SIGNATURE_IMAGE_KEY) ?? "");
+  const [signatureName, setSignatureName] = useState(() => localStorage.getItem(SIGNATURE_NAME_KEY) ?? DEFAULT_SIGNATURE_NAME);
 
-  const signMutation = useSignDocument({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["/api/documents", id] });
-        queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
-        toast({ title: "Успешно", description: "Документ переведен в статус 'Подписан'" });
-      },
-      onError: (err) => toast({ title: "Ошибка", description: err.message, variant: "destructive" })
+  const refreshDocument = () => {
+    queryClient.invalidateQueries({ queryKey: [`/api/documents/${id}`] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/stats"] });
+  };
+
+  const runDocumentAction = async (path: string, successMessage: string) => {
+    setActionLoading(true);
+    try {
+      const resp = await apiFetch(path, { method: "POST" });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.error ?? "Не удалось выполнить действие");
+      }
+      const updatedDoc = await resp.json();
+      queryClient.setQueryData([`/api/documents/${id}`], updatedDoc);
+      refreshDocument();
+      toast({ title: "Успешно", description: successMessage });
+    } catch (err: any) {
+      toast({ title: "Ошибка", description: err.message, variant: "destructive" });
+    } finally {
+      setActionLoading(false);
     }
-  });
+  };
 
   const handlePrint = () => {
     window.print();
     // In a real app, printing might trigger a status change to 'printed' via API
+  };
+
+  const handleSignatureNameChange = (value: string) => {
+    setSignatureName(value);
+    localStorage.setItem(SIGNATURE_NAME_KEY, value);
+  };
+
+  const handleSignatureUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Ошибка", description: "Загрузите изображение подписи", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > 1_500_000) {
+      toast({ title: "Ошибка", description: "Файл подписи должен быть меньше 1.5 МБ", variant: "destructive" });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result ?? "");
+      setSignatureImage(dataUrl);
+      localStorage.setItem(SIGNATURE_IMAGE_KEY, dataUrl);
+      toast({ title: "Успешно", description: "Подпись обновлена" });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearSignatureImage = () => {
+    setSignatureImage("");
+    localStorage.removeItem(SIGNATURE_IMAGE_KEY);
   };
 
   if (isLoading) {
@@ -98,14 +161,24 @@ export default function DocumentView() {
             <Button variant="outline" onClick={handlePrint} className="hover-elevate bg-background border-border/60">
               <Printer className="w-4 h-4 mr-2" /> Печать
             </Button>
-            {doc.status !== 'signed' && (
+            {role === "hr" && doc.status === "draft" && (
               <Button 
-                onClick={() => signMutation.mutate({ id: doc.id })} 
-                disabled={signMutation.isPending}
+                onClick={() => runDocumentAction(`/documents/${doc.id}/send-signature`, "Документ отправлен директору на подпись")} 
+                disabled={actionLoading}
+                className="bg-primary text-primary-foreground shadow-md shadow-primary/20 hover-elevate"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Отправить на подпись
+              </Button>
+            )}
+            {role === "director" && doc.status === "pending_signature" && (
+              <Button 
+                onClick={() => runDocumentAction(`/documents/${doc.id}/sign`, "Документ подписан директором")} 
+                disabled={actionLoading}
                 className="bg-primary text-primary-foreground shadow-md shadow-primary/20 hover-elevate"
               >
                 <PenTool className="w-4 h-4 mr-2" />
-                Утвердить подпись
+                Подписать документ
               </Button>
             )}
           </div>
@@ -131,8 +204,19 @@ export default function DocumentView() {
               <div className="mt-24 pt-12 border-t border-gray-300 grid grid-cols-2 gap-10">
                 <div>
                   <p className="font-bold mb-8">РАБОТОДАТЕЛЬ:</p>
-                  <div className="border-b border-black mb-2 h-8"></div>
-                  <p className="text-sm text-gray-500 text-center">подпись / М.П.</p>
+                  <div className="border-b border-black mb-2 h-16 flex items-end justify-center">
+                    {doc.status === "signed" && (
+                      signatureImage ? (
+                        <img src={signatureImage} alt="Подпись директора" className="max-h-14 max-w-[220px] object-contain" />
+                      ) : (
+                        <span className="italic px-2 text-base">{signatureName || DEFAULT_SIGNATURE_NAME}</span>
+                      )
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 text-center">{signatureName || DEFAULT_SIGNATURE_NAME} / подпись</p>
+                  {doc.status === "signed" && doc.signedAt && (
+                    <p className="text-xs text-gray-500 text-center mt-1">Дата подписи: {formatDate(doc.signedAt)}</p>
+                  )}
                 </div>
                 <div>
                   <p className="font-bold mb-8">РАБОТНИК:</p>
@@ -178,6 +262,63 @@ export default function DocumentView() {
                 )}
               </div>
             </Card>
+
+            {role === "director" && (
+              <Card className="p-5 border-border/50 shadow-sm bg-card/50 backdrop-blur-sm">
+                <h3 className="font-semibold text-foreground mb-4">Подпись директора</h3>
+                <div className="space-y-4 text-sm">
+                  <div className="space-y-2">
+                    <Label htmlFor="signatureName">Расшифровка</Label>
+                    <Input
+                      id="signatureName"
+                      value={signatureName}
+                      onChange={(event) => handleSignatureNameChange(event.target.value)}
+                      placeholder="Например: Иванов И.И."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="signatureImage">Изображение подписи</Label>
+                    <Input
+                      id="signatureImage"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleSignatureUpload}
+                    />
+                  </div>
+
+                  {signatureImage ? (
+                    <div className="rounded-md border border-border/60 bg-white p-3">
+                      <img src={signatureImage} alt="Текущая подпись" className="mx-auto max-h-20 object-contain" />
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-dashed border-border/70 p-3 text-center text-xs text-muted-foreground">
+                      Подпись пока не загружена
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button asChild variant="outline" size="sm" className="flex-1">
+                      <Label htmlFor="signatureImage" className="cursor-pointer">
+                        <Upload className="w-4 h-4 mr-2" />
+                        Загрузить
+                      </Label>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearSignatureImage}
+                      disabled={!signatureImage}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Очистить
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
 
         </div>

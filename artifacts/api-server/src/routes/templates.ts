@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db, customTemplatesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { demoStore } from "../lib/demo-store";
 
 const router: IRouter = Router();
 
@@ -187,6 +188,22 @@ export const STATIC_TEMPLATES = [
 ];
 
 router.get("/", async (_req, res) => {
+  if (demoStore.isEnabled) {
+    const custom = demoStore.listCustomTemplates().map((r) => ({
+      id: r.id + 1000,
+      name: r.name,
+      type: r.type,
+      description: r.description,
+      fields: r.fields,
+      content: r.content,
+      isCustom: true,
+      createdAt: r.createdAt.toISOString(),
+    }));
+    return res.json([...STATIC_TEMPLATES, ...custom]);
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
   const customRows = await db.select().from(customTemplatesTable).orderBy(customTemplatesTable.createdAt);
   const custom = customRows.map((r) => ({
     id: r.id + 1000,
@@ -221,9 +238,32 @@ router.post("/", async (req, res) => {
   const fields = Array.from(found).map((key) => ({
     key,
     label: key,
-    type: "text",
+    type: "text" as const,
     required: true,
   }));
+
+  if (demoStore.isEnabled) {
+    const row = demoStore.createCustomTemplate({
+      name,
+      type: "custom",
+      description: description ?? "",
+      fields,
+      content,
+    });
+
+    return res.status(201).json({
+      id: row.id + 1000,
+      name: row.name,
+      type: row.type,
+      description: row.description,
+      fields: row.fields,
+      content: row.content,
+      isCustom: true,
+      createdAt: row.createdAt.toISOString(),
+    });
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
 
   const [row] = await db
     .insert(customTemplatesTable)
@@ -247,6 +287,14 @@ router.delete("/:id", async (req, res) => {
   if (dbId < 1) {
     return res.status(400).json({ error: "Нельзя удалить встроенный шаблон" });
   }
+
+  if (demoStore.isEnabled) {
+    demoStore.deleteCustomTemplate(dbId);
+    return res.json({ success: true, message: "Шаблон удалён" });
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
   await db.delete(customTemplatesTable).where(eq(customTemplatesTable.id, dbId));
   res.json({ success: true, message: "Шаблон удалён" });
 });

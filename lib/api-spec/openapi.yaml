@@ -328,7 +328,7 @@ components:
           type: string
         status:
           type: string
-          enum: [draft, signed, printed]
+          enum: [draft, pending_signature, signed, printed]
         employeeId:
           type: integer
         employeeName:

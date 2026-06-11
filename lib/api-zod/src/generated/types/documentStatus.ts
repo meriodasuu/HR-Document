@@ -11,6 +11,7 @@ export type DocumentStatus =
 
 export const DocumentStatus = {
   draft: "draft",
+  pendingSignature: "pending_signature",
   signed: "signed",
   printed: "printed",
 } as const;

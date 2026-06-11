@@ -21,7 +21,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { logout, getUser } from "@/lib/auth";
+import { logout, getUser, getRole } from "@/lib/auth";
 
 const mainItems = [
   { title: "Главная", url: "/", icon: Home },
@@ -38,6 +38,10 @@ interface AppSidebarProps {
 export function AppSidebar({ onLogout }: AppSidebarProps) {
   const [location] = useLocation();
   const username = getUser() ?? "hr";
+  const role = getRole();
+  const visibleItems = role === "director"
+    ? mainItems.filter((item) => item.url === "/" || item.url === "/documents")
+    : mainItems;
 
   const handleLogout = async () => {
     await logout();
@@ -63,7 +67,7 @@ export function AppSidebar({ onLogout }: AppSidebarProps) {
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-2">
             <SidebarMenu className="gap-1">
-              {mainItems.map((item) => {
+              {visibleItems.map((item) => {
                 const isActive = location === item.url || (item.url !== "/" && location.startsWith(item.url));
                 
                 return (
@@ -99,7 +103,7 @@ export function AppSidebar({ onLogout }: AppSidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground truncate">{username}</p>
-            <p className="text-xs text-muted-foreground">HR-сотрудник</p>
+            <p className="text-xs text-muted-foreground">{role === "director" ? "Директор" : "HR-сотрудник"}</p>
           </div>
           <Button
             variant="ghost"

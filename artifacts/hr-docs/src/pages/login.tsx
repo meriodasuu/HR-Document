@@ -103,8 +103,9 @@ export default function Login({ onLogin }: LoginProps) {
 
           <div className="mt-5 pt-4 border-t border-border/50">
             <p className="text-xs text-muted-foreground text-center leading-relaxed">
-              Доступ разрешён только сотрудникам HR-отдела.<br />
-              Логин: <span className="font-mono text-foreground">hr</span> · Пароль: <span className="font-mono text-foreground">hr2024</span>
+              Демо-доступ для двух ролей системы.<br />
+              HR: <span className="font-mono text-foreground">hr</span> / <span className="font-mono text-foreground">hr2024</span><br />
+              Директор: <span className="font-mono text-foreground">director</span> / <span className="font-mono text-foreground">director2024</span>
             </p>
           </div>
         </Card>

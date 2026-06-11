@@ -11,7 +11,7 @@ import Documents from "./pages/documents";
 import CreateDocument from "./pages/create-document";
 import DocumentView from "./pages/document-view";
 import Templates from "./pages/templates";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated, validateCurrentSession } from "@/lib/auth";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,10 +40,20 @@ function App() {
   const [authed, setAuthed] = useState<boolean>(isAuthenticated());
 
   useEffect(() => {
-    setAuthed(isAuthenticated());
+    let cancelled = false;
+    if (isAuthenticated()) {
+      validateCurrentSession().then((valid) => {
+        if (!cancelled) setAuthed(valid);
+      });
+    } else {
+      setAuthed(false);
+    }
     const handler = () => { setAuthed(false); queryClient.clear(); };
     window.addEventListener("hr-logout", handler);
-    return () => window.removeEventListener("hr-logout", handler);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("hr-logout", handler);
+    };
   }, []);
 
   const handleLogin = () => {

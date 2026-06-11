@@ -8,55 +8,95 @@ import {
   UpdateEmployeeBody,
   DeleteEmployeeParams,
 } from "@workspace/api-zod";
+import { demoStore } from "../lib/demo-store";
 
 const router: IRouter = Router();
 
+function serializeEmployee(employee: {
+  salary?: string | number | null;
+  createdAt: Date;
+}) {
+  return {
+    ...employee,
+    salary: employee.salary ? Number(employee.salary) : undefined,
+    createdAt: employee.createdAt.toISOString(),
+  };
+}
+
+function toDbEmployeeInput(body: ReturnType<typeof CreateEmployeeBody.parse>) {
+  return {
+    ...body,
+    salary: body.salary === undefined ? undefined : String(body.salary),
+  };
+}
+
 router.get("/", async (req, res) => {
+  if (demoStore.isEnabled) {
+    return res.json(demoStore.listEmployees().map(serializeEmployee));
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
   const employees = await db.select().from(employeesTable).orderBy(employeesTable.fullName);
-  res.json(
-    employees.map((e) => ({
-      ...e,
-      salary: e.salary ? Number(e.salary) : undefined,
-      createdAt: e.createdAt.toISOString(),
-    }))
-  );
+  res.json(employees.map(serializeEmployee));
 });
 
 router.post("/", async (req, res) => {
   const body = CreateEmployeeBody.parse(req.body);
-  const [employee] = await db.insert(employeesTable).values(body).returning();
-  res.status(201).json({
-    ...employee,
-    salary: employee.salary ? Number(employee.salary) : undefined,
-    createdAt: employee.createdAt.toISOString(),
-  });
+
+  if (demoStore.isEnabled) {
+    return res.status(201).json(serializeEmployee(demoStore.createEmployee(body)));
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
+  const [employee] = await db.insert(employeesTable).values(toDbEmployeeInput(body)).returning();
+  res.status(201).json(serializeEmployee(employee));
 });
 
 router.get("/:id", async (req, res) => {
   const { id } = GetEmployeeParams.parse({ id: Number(req.params.id) });
+
+  if (demoStore.isEnabled) {
+    const employee = demoStore.getEmployee(id);
+    if (!employee) return res.status(404).json({ error: "Not found" });
+    return res.json(serializeEmployee(employee));
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
   const [employee] = await db.select().from(employeesTable).where(eq(employeesTable.id, id));
   if (!employee) return res.status(404).json({ error: "Not found" });
-  res.json({
-    ...employee,
-    salary: employee.salary ? Number(employee.salary) : undefined,
-    createdAt: employee.createdAt.toISOString(),
-  });
+  res.json(serializeEmployee(employee));
 });
 
 router.put("/:id", async (req, res) => {
   const { id } = UpdateEmployeeParams.parse({ id: Number(req.params.id) });
   const body = UpdateEmployeeBody.parse(req.body);
-  const [employee] = await db.update(employeesTable).set(body).where(eq(employeesTable.id, id)).returning();
+
+  if (demoStore.isEnabled) {
+    const employee = demoStore.updateEmployee(id, body);
+    if (!employee) return res.status(404).json({ error: "Not found" });
+    return res.json(serializeEmployee(employee));
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
+  const [employee] = await db.update(employeesTable).set(toDbEmployeeInput(body)).where(eq(employeesTable.id, id)).returning();
   if (!employee) return res.status(404).json({ error: "Not found" });
-  res.json({
-    ...employee,
-    salary: employee.salary ? Number(employee.salary) : undefined,
-    createdAt: employee.createdAt.toISOString(),
-  });
+  res.json(serializeEmployee(employee));
 });
 
 router.delete("/:id", async (req, res) => {
   const { id } = DeleteEmployeeParams.parse({ id: Number(req.params.id) });
+
+  if (demoStore.isEnabled) {
+    demoStore.deleteEmployee(id);
+    return res.json({ success: true, message: "Employee deleted" });
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
   await db.delete(employeesTable).where(eq(employeesTable.id, id));
   res.json({ success: true, message: "Employee deleted" });
 });

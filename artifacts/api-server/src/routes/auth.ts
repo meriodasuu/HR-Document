@@ -8,11 +8,12 @@ router.post("/login", (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ error: "Укажите имя пользователя и пароль" });
   }
-  if (!checkCredentials(username, password)) {
+  const user = checkCredentials(username, password);
+  if (!user) {
     return res.status(401).json({ error: "Неверные учётные данные" });
   }
-  const token = createSession(username);
-  res.json({ token, username });
+  const token = createSession(user.username, user.role);
+  res.json({ token, username: user.username, role: user.role });
 });
 
 router.post("/logout", (req, res) => {
@@ -32,7 +33,7 @@ router.get("/me", (req, res) => {
   if (!session) {
     return res.status(401).json({ error: "Сессия истекла" });
   }
-  res.json({ username: session.username });
+  res.json({ username: session.username, role: session.role });
 });
 
 export default router;
