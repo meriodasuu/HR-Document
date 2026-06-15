@@ -30,6 +30,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (_req, res) => {
+  res.json({
+    status: "ok",
+    service: "HR Document API",
+    health: "/api/healthz",
+  });
+});
+
 app.use("/api", router);
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
