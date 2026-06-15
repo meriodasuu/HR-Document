@@ -25,7 +25,7 @@ Recommended settings:
 ```text
 Name: hr-document-api
 Environment: Node
-Build Command: corepack enable && corepack prepare pnpm@11.5.1 --activate && pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+Build Command: pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
 Start Command: pnpm --filter @workspace/api-server run start
 ```
 
@@ -34,6 +34,7 @@ If the repository root contains the project directly, leave `Root Directory` emp
 Environment variables:
 
 ```text
+NODE_VERSION=22.16.0
 DATABASE_URL=<Render internal PostgreSQL URL>
 HR_USERNAME=<your HR login>
 HR_PASSWORD=<your HR password>
@@ -60,7 +61,7 @@ For Vercel:
 ```text
 Framework Preset: Vite
 Root Directory: artifacts/hr-docs
-Install Command: cd ../.. && corepack enable && corepack prepare pnpm@11.5.1 --activate && pnpm install --frozen-lockfile
+Install Command: cd ../.. && pnpm install --frozen-lockfile
 Build Command: cd ../.. && pnpm --filter @workspace/hr-docs run build
 Output Directory: dist/public
 ```
@@ -68,6 +69,7 @@ Output Directory: dist/public
 Environment variable:
 
 ```text
+NODE_VERSION=22.16.0
 API_URL=<Render API URL>
 ```
 
