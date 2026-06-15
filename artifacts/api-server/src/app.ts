@@ -1,4 +1,5 @@
 import express, { type Express } from "express";
+import type { ErrorRequestHandler } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
@@ -30,5 +31,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+  if (err?.name === "ZodError") {
+    return res.status(400).json({
+      error: "Invalid request data",
+      details: err.issues,
+    });
+  }
+
+  logger.error({ err }, "Unhandled API error");
+  return res.status(500).json({ error: "Internal server error" });
+};
+
+app.use(errorHandler);
 
 export default app;

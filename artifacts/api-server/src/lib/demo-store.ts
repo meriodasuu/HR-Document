@@ -51,89 +51,13 @@ export interface DemoTemplate {
   createdAt: Date;
 }
 
-let nextEmployeeId = 4;
-let nextDocumentId = 3;
+let nextEmployeeId = 1;
+let nextDocumentId = 1;
 let nextTemplateId = 1;
 
-const employees: DemoEmployee[] = [
-  {
-    id: 1,
-    fullName: "Ivan Petrov",
-    position: "HR manager",
-    department: "People Operations",
-    employeeNumber: "EMP-001",
-    hireDate: "2024-02-12",
-    salary: 95000,
-    phone: "+7 900 111-22-33",
-    email: "ivan.petrov@example.com",
-    createdAt: new Date("2024-02-12T09:00:00.000Z"),
-  },
-  {
-    id: 2,
-    fullName: "Anna Smirnova",
-    position: "Accountant",
-    department: "Finance",
-    employeeNumber: "EMP-002",
-    hireDate: "2023-09-01",
-    salary: 110000,
-    phone: "+7 900 222-33-44",
-    email: "anna.smirnova@example.com",
-    createdAt: new Date("2023-09-01T09:00:00.000Z"),
-  },
-  {
-    id: 3,
-    fullName: "Dmitry Orlov",
-    position: "Frontend developer",
-    department: "IT",
-    employeeNumber: "EMP-003",
-    hireDate: "2025-01-20",
-    salary: 160000,
-    phone: "+7 900 333-44-55",
-    email: "dmitry.orlov@example.com",
-    createdAt: new Date("2025-01-20T09:00:00.000Z"),
-  },
-];
+const employees: DemoEmployee[] = [];
 
-const documents: DemoDocument[] = [
-  {
-    id: 1,
-    number: "P-001/2026",
-    type: "order_hire",
-    title: "Hiring order",
-    status: "signed",
-    employeeId: 3,
-    templateId: 1,
-    content: [
-      "HIRING ORDER No. 001",
-      "",
-      "Accept Dmitry Orlov to the IT department as Frontend developer.",
-      "Start date: 2025-01-20.",
-      "",
-      "Director: _____________________",
-    ].join("\n"),
-    signedAt: new Date("2026-06-01T12:00:00.000Z"),
-    createdAt: new Date("2026-06-01T10:00:00.000Z"),
-  },
-  {
-    id: 2,
-    number: "TD-002/2026",
-    type: "contract",
-    title: "Employment contract",
-    status: "draft",
-    employeeId: 1,
-    templateId: 3,
-    content: [
-      "EMPLOYMENT CONTRACT No. 002",
-      "",
-      "Employer and Ivan Petrov agree on employment terms.",
-      "Position: HR manager.",
-      "Department: People Operations.",
-      "",
-      "Employee: _____________________",
-    ].join("\n"),
-    createdAt: new Date("2026-06-03T10:00:00.000Z"),
-  },
-];
+const documents: DemoDocument[] = [];
 
 const customTemplates: DemoTemplate[] = [];
 
