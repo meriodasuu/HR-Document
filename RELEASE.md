@@ -2,7 +2,10 @@
 
 ## Demo release
 
-This release is prepared for diploma demonstration and works without a required database connection.
+This release is prepared for diploma demonstration and can work in two modes:
+
+- PostgreSQL mode with persistent data storage.
+- Demo mode without a database for local quick checks.
 
 ## How to run
 
@@ -54,7 +57,8 @@ password: director2024
 - Director signature workflow.
 - Uploading and changing the director signature image.
 - Document preview and printing.
-- Demo mode without PostgreSQL.
+- PostgreSQL data storage.
+- Demo mode fallback for local checks without PostgreSQL.
 
 ## Release checks
 
@@ -62,9 +66,29 @@ password: director2024
 - Production build: passed.
 - API default port: `5000`.
 - API validation errors are returned as `400` instead of generic `500`.
+- PostgreSQL tables are created automatically on API startup when `DATABASE_URL` is set.
 
 ## Known limitations
 
-- Demo data is stored in memory and resets after API restart.
-- Microsoft SQL Server integration is planned as the next step.
+- If `DATABASE_URL` is not set, the API uses in-memory demo storage and data resets after API restart.
+- Microsoft SQL Server integration can be added later if the product needs to use SSMS locally.
 - Frontend bundle size can be optimized later with code splitting.
+
+## Production environment variables
+
+For persistent storage, set:
+
+```text
+DATABASE_URL=postgresql://...
+```
+
+Do not set `DEMO_MODE=1` in production, otherwise the API will use in-memory storage even if `DATABASE_URL` exists.
+
+Optional custom users:
+
+```text
+HR_USERNAME=your_hr_login
+HR_PASSWORD=your_hr_password
+DIRECTOR_USERNAME=your_director_login
+DIRECTOR_PASSWORD=your_director_password
+```
