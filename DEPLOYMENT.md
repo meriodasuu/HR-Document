@@ -25,7 +25,7 @@ Recommended settings:
 ```text
 Name: hr-document-api
 Environment: Node
-Build Command: pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+Build Command: pnpm install --frozen-lockfile --config.dangerously-allow-all-builds=true && pnpm --filter @workspace/api-server run build
 Start Command: pnpm --filter @workspace/api-server run start
 ```
 
@@ -61,7 +61,7 @@ For Vercel:
 ```text
 Framework Preset: Vite
 Root Directory: artifacts/hr-docs
-Install Command: cd ../.. && pnpm install --frozen-lockfile
+Install Command: cd ../.. && pnpm install --frozen-lockfile --config.dangerously-allow-all-builds=true
 Build Command: cd ../.. && pnpm --filter @workspace/hr-docs run build
 Output Directory: dist/public
 ```
