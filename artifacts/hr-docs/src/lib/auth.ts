@@ -1,6 +1,7 @@
 const TOKEN_KEY = "hr_auth_token";
 const USER_KEY = "hr_auth_user";
 const ROLE_KEY = "hr_auth_role";
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "") ?? "";
 
 export type UserRole = "hr" | "director";
 
@@ -39,7 +40,7 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
     ...(options.headers as Record<string, string> ?? {}),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
-  const response = await fetch(`/api${path}`, { ...options, headers });
+  const response = await fetch(`${API_BASE_URL}/api${path}`, { ...options, headers });
   if (response.status === 401) {
     clearAuth();
     window.dispatchEvent(new Event("hr-logout"));
@@ -51,7 +52,7 @@ export async function validateCurrentSession(): Promise<boolean> {
   const token = getToken();
   if (!token) return false;
 
-  const response = await fetch("/api/auth/me", {
+  const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
     headers: { "Authorization": `Bearer ${token}` },
   }).catch(() => null);
 
@@ -69,7 +70,7 @@ export async function validateCurrentSession(): Promise<boolean> {
 }
 
 export async function login(username: string, password: string): Promise<{ token: string; username: string; role: UserRole }> {
-  const resp = await fetch("/api/auth/login", {
+  const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -86,7 +87,7 @@ export async function login(username: string, password: string): Promise<{ token
 export async function logout(): Promise<void> {
   const token = getToken();
   if (token) {
-    await fetch("/api/auth/logout", {
+    await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: "POST",
       headers: { "Authorization": `Bearer ${token}` },
     }).catch(() => {});

@@ -70,13 +70,13 @@ Environment variable:
 
 ```text
 NODE_VERSION=22.16.0
-API_URL=<Render API URL>
+VITE_API_URL=<Render API URL>
 ```
 
 Example:
 
 ```text
-API_URL=https://hr-document-api.onrender.com
+VITE_API_URL=https://hr-document-api.onrender.com
 ```
 
 ## 4. Release check
