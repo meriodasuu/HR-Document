@@ -85,6 +85,50 @@ export default function DocumentView() {
     // In a real app, printing might trigger a status change to 'printed' via API
   };
 
+  const handleEmployeeScanUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!doc) return;
+
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp", "application/pdf"];
+    if (!allowedTypes.includes(file.type)) {
+      toast({ title: "Ошибка", description: "Загрузите скан в формате PNG, JPG, WEBP или PDF", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > 4_500_000) {
+      toast({ title: "Ошибка", description: "Файл скана должен быть меньше 4.5 МБ", variant: "destructive" });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const scanDataUrl = String(reader.result ?? "");
+      setActionLoading(true);
+      try {
+        const resp = await apiFetch(`/documents/${doc.id}/employee-scan`, {
+          method: "POST",
+          body: JSON.stringify({ scanDataUrl, fileName: file.name }),
+        });
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          throw new Error(data.error ?? "Не удалось загрузить скан документа");
+        }
+        const updatedDoc = await resp.json();
+        queryClient.setQueryData([`/api/documents/${id}`], updatedDoc);
+        refreshDocument();
+        toast({ title: "Успешно", description: "Скан загружен, документ ожидает подписи директора" });
+      } catch (err: any) {
+        toast({ title: "Ошибка", description: err.message, variant: "destructive" });
+      } finally {
+        setActionLoading(false);
+        event.target.value = "";
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSignatureNameChange = (value: string) => {
     setSignatureName(value);
     localStorage.setItem(SIGNATURE_NAME_KEY, value);
@@ -151,19 +195,19 @@ export default function DocumentView() {
       <div className="space-y-6 pb-20 animate-in fade-in duration-500">
         
         {/* Top actions - Hidden in print */}
-        <div className="flex items-center justify-between print:hidden">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between print:hidden">
           <Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground hover-elevate -ml-4">
             <Link href="/documents">
               <ArrowLeft className="w-4 h-4 mr-2" /> Реестр документов
             </Link>
           </Button>
-          <div className="flex gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             <Button variant="outline" onClick={handlePrint} className="hover-elevate bg-background border-border/60">
               <Printer className="w-4 h-4 mr-2" /> Печать
             </Button>
-            {role === "hr" && doc.status === "draft" && (
+            {false && role === "hr" && doc!.status === "draft" && (
               <Button 
-                onClick={() => runDocumentAction(`/documents/${doc.id}/send-signature`, "Документ отправлен директору на подпись")} 
+                onClick={() => runDocumentAction(`/documents/${doc!.id}/send-signature`, "Документ отправлен директору на подпись")} 
                 disabled={actionLoading}
                 className="bg-primary text-primary-foreground shadow-md shadow-primary/20 hover-elevate"
               >
@@ -188,20 +232,20 @@ export default function DocumentView() {
           
           {/* Main Document Area */}
           <div className="xl:col-span-3">
-            <Card id="printable-document" className="bg-white text-black p-10 sm:p-16 md:p-20 min-h-[1056px] shadow-xl border border-gray-200 official-document print:shadow-none print:border-none">
+            <Card id="printable-document" className="bg-white text-black p-5 sm:p-10 md:p-16 lg:p-20 min-h-[720px] sm:min-h-[1056px] shadow-xl border border-gray-200 official-document print:shadow-none print:border-none">
               {/* Document Header */}
               <div className="text-center mb-12 border-b-2 border-black pb-6">
-                <h1 className="text-2xl font-bold uppercase tracking-wider mb-2">{doc.title}</h1>
+                <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider mb-2">{doc.title}</h1>
                 <p className="text-gray-600 font-sans text-sm">№ {doc.number} от {formatDate(doc.createdAt)}</p>
               </div>
 
               {/* Document Content - rendering raw HTML/text safely. Assuming pre-formatted string with newlines for simplicity based on schema */}
-              <div className="whitespace-pre-wrap text-justify leading-loose text-lg font-serif">
+              <div className="whitespace-pre-wrap text-left sm:text-justify leading-loose text-base sm:text-lg font-serif">
                 {doc.content}
               </div>
 
               {/* Document Signatures */}
-              <div className="mt-24 pt-12 border-t border-gray-300 grid grid-cols-2 gap-10">
+              <div className="mt-16 sm:mt-24 pt-8 sm:pt-12 border-t border-gray-300 grid grid-cols-1 sm:grid-cols-2 gap-10">
                 <div>
                   <p className="font-bold mb-8">РАБОТОДАТЕЛЬ:</p>
                   <div className="border-b border-black mb-2 h-16 flex items-end justify-center">
@@ -258,6 +302,51 @@ export default function DocumentView() {
                 {doc.status === 'signed' && doc.signedAt && (
                   <div>
                     <p className="text-xs text-muted-foreground mt-2">Подписан: {formatDate(doc.signedAt)}</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            <Card className="p-5 border-border/50 shadow-sm bg-card/50 backdrop-blur-sm">
+              <h3 className="font-semibold text-foreground mb-4">Скан с подписью сотрудника</h3>
+              <div className="space-y-4 text-sm">
+                {doc.employeeScanDataUrl ? (
+                  <>
+                    <div className="rounded-md border border-border/60 bg-white p-3">
+                      {doc.employeeScanDataUrl.startsWith("data:image/") ? (
+                        <img src={doc.employeeScanDataUrl} alt="Скан документа с подписью сотрудника" className="mx-auto max-h-48 object-contain" />
+                      ) : (
+                        <p className="text-center text-muted-foreground">Загружен файл: {doc.employeeScanFileName ?? "скан документа"}</p>
+                      )}
+                    </div>
+                    <Button asChild variant="outline" size="sm" className="w-full">
+                      <a href={doc.employeeScanDataUrl} target="_blank" rel="noreferrer">
+                        Открыть скан
+                      </a>
+                    </Button>
+                    {doc.employeeSignedAt && (
+                      <p className="text-xs text-muted-foreground">Скан загружен: {formatDate(doc.employeeSignedAt)}</p>
+                    )}
+                  </>
+                ) : (
+                  <div className="rounded-md border border-dashed border-border/70 p-3 text-center text-xs text-muted-foreground">
+                    Скан подписанного сотрудником документа еще не загружен.
+                  </div>
+                )}
+
+                {role === "hr" && doc.status === "draft" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="employeeScan">Загрузить скан после подписи сотрудника</Label>
+                    <Input
+                      id="employeeScan"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,application/pdf"
+                      onChange={handleEmployeeScanUpload}
+                      disabled={actionLoading}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      После загрузки скана документ получит статус ожидания подписи директора.
+                    </p>
                   </div>
                 )}
               </div>

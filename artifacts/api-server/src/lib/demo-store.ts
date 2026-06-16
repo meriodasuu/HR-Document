@@ -31,6 +31,9 @@ export interface DemoDocument {
   employeeId: number;
   content: string;
   templateId?: number;
+  employeeScanDataUrl?: string;
+  employeeScanFileName?: string;
+  employeeSignedAt?: Date;
   signedAt?: Date;
   createdAt: Date;
 }
@@ -145,6 +148,17 @@ export const demoStore = {
   sendDocumentToSignature(id: number) {
     const document = this.getDocument(id);
     if (!document) return undefined;
+    document.status = "pending_signature";
+    document.signedAt = undefined;
+    return document;
+  },
+
+  attachEmployeeScan(id: number, input: { dataUrl: string; fileName?: string }) {
+    const document = this.getDocument(id);
+    if (!document) return undefined;
+    document.employeeScanDataUrl = input.dataUrl;
+    document.employeeScanFileName = input.fileName;
+    document.employeeSignedAt = new Date();
     document.status = "pending_signature";
     document.signedAt = undefined;
     return document;

@@ -127,6 +127,9 @@ export const GetDocumentsResponseItem = zod.object({
   employeeName: zod.string(),
   content: zod.string(),
   createdAt: zod.string(),
+  employeeScanDataUrl: zod.string().optional(),
+  employeeScanFileName: zod.string().optional(),
+  employeeSignedAt: zod.string().optional(),
   signedAt: zod.string().optional(),
   templateId: zod.number().optional(),
 });
@@ -158,6 +161,9 @@ export const GetDocumentResponse = zod.object({
   employeeName: zod.string(),
   content: zod.string(),
   createdAt: zod.string(),
+  employeeScanDataUrl: zod.string().optional(),
+  employeeScanFileName: zod.string().optional(),
+  employeeSignedAt: zod.string().optional(),
   signedAt: zod.string().optional(),
   templateId: zod.number().optional(),
 });
@@ -191,6 +197,9 @@ export const SignDocumentResponse = zod.object({
   employeeName: zod.string(),
   content: zod.string(),
   createdAt: zod.string(),
+  employeeScanDataUrl: zod.string().optional(),
+  employeeScanFileName: zod.string().optional(),
+  employeeSignedAt: zod.string().optional(),
   signedAt: zod.string().optional(),
   templateId: zod.number().optional(),
 });

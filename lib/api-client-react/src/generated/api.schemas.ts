@@ -53,6 +53,9 @@ export interface Document {
   employeeName: string;
   content: string;
   createdAt: string;
+  employeeScanDataUrl?: string;
+  employeeScanFileName?: string;
+  employeeSignedAt?: string;
   signedAt?: string;
   templateId?: number;
 }

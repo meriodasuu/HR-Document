@@ -45,11 +45,12 @@ function generateDocNumber(type: string, id: number): string {
   return `${prefix[type] || "Д"}-${String(id).padStart(3, "0")}/${year}`;
 }
 
-function serializeDocument<T extends { signedAt?: Date | null; createdAt: Date }>(doc: T, employeeName: string) {
+function serializeDocument<T extends { signedAt?: Date | null; employeeSignedAt?: Date | null; createdAt: Date }>(doc: T, employeeName: string) {
   return {
     ...doc,
     employeeName,
     createdAt: doc.createdAt.toISOString(),
+    employeeSignedAt: doc.employeeSignedAt?.toISOString(),
     signedAt: doc.signedAt?.toISOString(),
   };
 }
@@ -88,6 +89,7 @@ router.get("/", async (req, res) => {
     ...r.doc,
     employeeName: r.emp.fullName,
     createdAt: r.doc.createdAt.toISOString(),
+    employeeSignedAt: r.doc.employeeSignedAt?.toISOString(),
     signedAt: r.doc.signedAt?.toISOString(),
   }));
 
@@ -172,6 +174,7 @@ router.post("/", async (req, res) => {
     ...updated,
     employeeName: employee.fullName,
     createdAt: updated.createdAt.toISOString(),
+    employeeSignedAt: updated.employeeSignedAt?.toISOString(),
     signedAt: updated.signedAt?.toISOString(),
   });
 });
@@ -202,6 +205,7 @@ router.get("/:id", async (req, res) => {
     ...r.doc,
     employeeName: r.emp.fullName,
     createdAt: r.doc.createdAt.toISOString(),
+    employeeSignedAt: r.doc.employeeSignedAt?.toISOString(),
     signedAt: r.doc.signedAt?.toISOString(),
   });
 });
@@ -252,6 +256,58 @@ router.post("/:id/send-signature", async (req, res) => {
   res.json(serializeDocument(doc, employee?.fullName ?? ""));
 });
 
+router.post("/:id/employee-scan", async (req, res) => {
+  if (getUserRole(req as any) !== "hr") {
+    return res.status(403).json({ error: "Only HR can upload employee signed scans" });
+  }
+
+  const { id } = SignDocumentParams.parse({ id: Number(req.params.id) });
+  const { scanDataUrl, fileName } = req.body ?? {};
+
+  if (typeof scanDataUrl !== "string" || !scanDataUrl.startsWith("data:")) {
+    return res.status(400).json({ error: "Upload a scanned document file" });
+  }
+
+  if (scanDataUrl.length > 6_000_000) {
+    return res.status(413).json({ error: "Scanned document file is too large" });
+  }
+
+  const employeeSignedAt = new Date();
+
+  if (demoStore.isEnabled) {
+    const current = demoStore.getDocument(id);
+    if (!current) return res.status(404).json({ error: "Not found" });
+    if (current.status !== "draft") {
+      return res.status(400).json({ error: "Only draft documents can receive an employee signed scan" });
+    }
+    const updated = demoStore.attachEmployeeScan(id, {
+      dataUrl: scanDataUrl,
+      fileName: typeof fileName === "string" ? fileName : undefined,
+    })!;
+    return res.json(serializeDocument(updated, demoStore.getEmployee(updated.employeeId)?.fullName ?? ""));
+  }
+
+  if (!db) return res.status(503).json({ error: "Database is not configured" });
+
+  const [doc] = await db
+    .update(documentsTable)
+    .set({
+      status: "pending_signature",
+      employeeScanDataUrl: scanDataUrl,
+      employeeScanFileName: typeof fileName === "string" ? fileName : null,
+      employeeSignedAt,
+      signedAt: null,
+    })
+    .where(and(eq(documentsTable.id, id), eq(documentsTable.status, "draft")))
+    .returning();
+
+  if (!doc) return res.status(404).json({ error: "Draft document not found" });
+
+  const [employee] = await db.select().from(employeesTable).where(eq(employeesTable.id, doc.employeeId));
+
+  res.json(serializeDocument(doc, employee?.fullName ?? ""));
+});
+
 router.post("/:id/sign", async (req, res) => {
   if (getUserRole(req as any) !== "director") {
     return res.status(403).json({ error: "Only director can sign documents" });
@@ -286,6 +342,7 @@ router.post("/:id/sign", async (req, res) => {
     ...doc,
     employeeName: employee?.fullName ?? "",
     createdAt: doc.createdAt.toISOString(),
+    employeeSignedAt: doc.employeeSignedAt?.toISOString(),
     signedAt: doc.signedAt?.toISOString(),
   });
 });

@@ -12,6 +12,9 @@ export const documentsTable = pgTable("documents", {
   employeeId: integer("employee_id").notNull().references(() => employeesTable.id),
   content: text("content").notNull(),
   templateId: integer("template_id"),
+  employeeScanDataUrl: text("employee_scan_data_url"),
+  employeeScanFileName: text("employee_scan_file_name"),
+  employeeSignedAt: timestamp("employee_signed_at"),
   signedAt: timestamp("signed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

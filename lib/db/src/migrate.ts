@@ -40,8 +40,18 @@ export async function ensureDatabaseSchema() {
       employee_id INTEGER NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
       content TEXT NOT NULL,
       template_id INTEGER,
+      employee_scan_data_url TEXT,
+      employee_scan_file_name TEXT,
+      employee_signed_at TIMESTAMP,
       signed_at TIMESTAMP,
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
+  `);
+
+  await pool.query(`
+    ALTER TABLE documents
+      ADD COLUMN IF NOT EXISTS employee_scan_data_url TEXT,
+      ADD COLUMN IF NOT EXISTS employee_scan_file_name TEXT,
+      ADD COLUMN IF NOT EXISTS employee_signed_at TIMESTAMP;
   `);
 }
