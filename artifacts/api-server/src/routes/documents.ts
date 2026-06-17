@@ -229,31 +229,9 @@ router.post("/:id/send-signature", async (req, res) => {
     return res.status(403).json({ error: "Only HR can send documents for signature" });
   }
 
-  const { id } = SignDocumentParams.parse({ id: Number(req.params.id) });
-
-  if (demoStore.isEnabled) {
-    const doc = demoStore.getDocument(id);
-    if (!doc) return res.status(404).json({ error: "Not found" });
-    if (doc.status !== "draft") {
-      return res.status(400).json({ error: "Only draft documents can be sent for signature" });
-    }
-    const updated = demoStore.sendDocumentToSignature(id)!;
-    return res.json(serializeDocument(updated, demoStore.getEmployee(updated.employeeId)?.fullName ?? ""));
-  }
-
-  if (!db) return res.status(503).json({ error: "Database is not configured" });
-
-  const [doc] = await db
-    .update(documentsTable)
-    .set({ status: "pending_signature", signedAt: null })
-    .where(and(eq(documentsTable.id, id), eq(documentsTable.status, "draft")))
-    .returning();
-
-  if (!doc) return res.status(404).json({ error: "Draft document not found" });
-
-  const [employee] = await db.select().from(employeesTable).where(eq(employeesTable.id, doc.employeeId));
-
-  res.json(serializeDocument(doc, employee?.fullName ?? ""));
+  return res.status(400).json({
+    error: "Upload the employee-signed scanned document before sending it to the director",
+  });
 });
 
 router.post("/:id/employee-scan", async (req, res) => {
@@ -321,6 +299,9 @@ router.post("/:id/sign", async (req, res) => {
     if (current.status !== "pending_signature") {
       return res.status(400).json({ error: "Document must be sent for signature first" });
     }
+    if (!current.employeeScanDataUrl) {
+      return res.status(400).json({ error: "Employee-signed scan is required before director signature" });
+    }
     const doc = demoStore.signDocument(id);
     if (!doc) return res.status(404).json({ error: "Not found" });
     return res.json(serializeDocument(doc, demoStore.getEmployee(doc.employeeId)?.fullName ?? ""));
@@ -331,10 +312,14 @@ router.post("/:id/sign", async (req, res) => {
   const [doc] = await db
     .update(documentsTable)
     .set({ status: "signed", signedAt: new Date() })
-    .where(and(eq(documentsTable.id, id), eq(documentsTable.status, "pending_signature")))
+    .where(and(
+      eq(documentsTable.id, id),
+      eq(documentsTable.status, "pending_signature"),
+      sql`${documentsTable.employeeScanDataUrl} IS NOT NULL`,
+    ))
     .returning();
 
-  if (!doc) return res.status(404).json({ error: "Document pending signature not found" });
+  if (!doc) return res.status(404).json({ error: "Employee-signed scanned document pending signature not found" });
 
   const [employee] = await db.select().from(employeesTable).where(eq(employeesTable.id, doc.employeeId));
 

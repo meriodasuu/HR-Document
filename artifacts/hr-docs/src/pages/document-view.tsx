@@ -232,7 +232,53 @@ export default function DocumentView() {
           
           {/* Main Document Area */}
           <div className="xl:col-span-3">
-            <Card id="printable-document" className="bg-white text-black p-5 sm:p-10 md:p-16 lg:p-20 min-h-[720px] sm:min-h-[1056px] shadow-xl border border-gray-200 official-document print:shadow-none print:border-none">
+            {doc.employeeScanDataUrl && (
+              <Card className="bg-white text-black p-5 sm:p-10 md:p-16 lg:p-20 min-h-[720px] shadow-xl border border-gray-200 official-document print:shadow-none print:border-none">
+                <div className="text-center mb-8 border-b-2 border-black pb-6">
+                  <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider mb-2">{doc.title}</h1>
+                  <p className="text-gray-600 font-sans text-sm">Документ для подписи директора № {doc.number}</p>
+                  {doc.employeeSignedAt && (
+                    <p className="text-gray-600 font-sans text-xs mt-2">Скан с подписью сотрудника загружен: {formatDate(doc.employeeSignedAt)}</p>
+                  )}
+                </div>
+
+                <div className="rounded border border-gray-300 bg-gray-50 p-3">
+                  {doc.employeeScanDataUrl.startsWith("data:image/") ? (
+                    <img
+                      src={doc.employeeScanDataUrl}
+                      alt="Документ с подписью сотрудника"
+                      className="mx-auto max-h-[780px] w-auto max-w-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex min-h-[520px] flex-col items-center justify-center gap-4 text-center font-sans text-gray-700">
+                      <p className="text-lg font-semibold">Загружен PDF-документ с подписью сотрудника</p>
+                      <p className="text-sm">{doc.employeeScanFileName ?? "scan.pdf"}</p>
+                      <a className="text-blue-700 underline" href={doc.employeeScanDataUrl} target="_blank" rel="noreferrer">
+                        Открыть PDF
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-8 mt-8 border-t border-gray-300">
+                  <p className="font-bold mb-6">ПОДПИСЬ ДИРЕКТОРА:</p>
+                  <div className="border-b border-black mb-2 h-16 flex items-end justify-center">
+                    {doc.status === "signed" && (
+                      signatureImage ? (
+                        <img src={signatureImage} alt="Подпись директора" className="max-h-14 max-w-[220px] object-contain" />
+                      ) : (
+                        <span className="italic px-2 text-base">{signatureName || DEFAULT_SIGNATURE_NAME}</span>
+                      )
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 text-center">{signatureName || DEFAULT_SIGNATURE_NAME} / подпись</p>
+                  {doc.status === "signed" && doc.signedAt && (
+                    <p className="text-xs text-gray-500 text-center mt-1">Дата подписи директора: {formatDate(doc.signedAt)}</p>
+                  )}
+                </div>
+              </Card>
+            )}
+            <Card id="printable-document" className={`${doc.employeeScanDataUrl ? "hidden" : ""} bg-white text-black p-5 sm:p-10 md:p-16 lg:p-20 min-h-[720px] sm:min-h-[1056px] shadow-xl border border-gray-200 official-document print:shadow-none print:border-none`}>
               {/* Document Header */}
               <div className="text-center mb-12 border-b-2 border-black pb-6">
                 <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider mb-2">{doc.title}</h1>
