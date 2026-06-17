@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useGetDocument } from "@workspace/api-client-react";
 import { useRoute, Link } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,6 +27,17 @@ import { apiFetch, getRole } from "@/lib/auth";
 const SIGNATURE_IMAGE_KEY = "director_signature_image";
 const SIGNATURE_NAME_KEY = "director_signature_name";
 const DEFAULT_SIGNATURE_NAME = "Директор";
+
+function dataUrlToObjectUrl(dataUrl?: string) {
+  if (!dataUrl) {
+    return "";
+  }
+
+  const [meta, base64] = dataUrl.split(",");
+  const mime = meta.match(/^data:(.*?);base64$/)?.[1] ?? "application/octet-stream";
+  const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+  return URL.createObjectURL(new Blob([bytes], { type: mime }));
+}
 
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
@@ -54,6 +65,18 @@ export default function DocumentView() {
   const [actionLoading, setActionLoading] = useState(false);
   const [signatureImage, setSignatureImage] = useState(() => localStorage.getItem(SIGNATURE_IMAGE_KEY) ?? "");
   const [signatureName, setSignatureName] = useState(() => localStorage.getItem(SIGNATURE_NAME_KEY) ?? DEFAULT_SIGNATURE_NAME);
+  const employeeScanObjectUrl = useMemo(
+    () => dataUrlToObjectUrl(doc?.employeeScanDataUrl),
+    [doc?.employeeScanDataUrl]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (employeeScanObjectUrl) {
+        URL.revokeObjectURL(employeeScanObjectUrl);
+      }
+    };
+  }, [employeeScanObjectUrl]);
 
   const refreshDocument = () => {
     queryClient.invalidateQueries({ queryKey: [`/api/documents/${id}`] });
@@ -233,48 +256,57 @@ export default function DocumentView() {
           {/* Main Document Area */}
           <div className="xl:col-span-3">
             {doc.employeeScanDataUrl && (
-              <Card className="bg-white text-black p-5 sm:p-10 md:p-16 lg:p-20 min-h-[720px] shadow-xl border border-gray-200 official-document print:shadow-none print:border-none">
-                <div className="text-center mb-8 border-b-2 border-black pb-6">
-                  <h1 className="text-xl sm:text-2xl font-bold uppercase tracking-wider mb-2">{doc.title}</h1>
-                  <p className="text-gray-600 font-sans text-sm">Документ для подписи директора № {doc.number}</p>
-                  {doc.employeeSignedAt && (
-                    <p className="text-gray-600 font-sans text-xs mt-2">Скан с подписью сотрудника загружен: {formatDate(doc.employeeSignedAt)}</p>
-                  )}
-                </div>
-
-                <div className="rounded border border-gray-300 bg-gray-50 p-3">
-                  {doc.employeeScanDataUrl.startsWith("data:image/") ? (
-                    <img
-                      src={doc.employeeScanDataUrl}
-                      alt="Документ с подписью сотрудника"
-                      className="mx-auto max-h-[780px] w-auto max-w-full object-contain"
-                    />
-                  ) : (
-                    <div className="flex min-h-[520px] flex-col items-center justify-center gap-4 text-center font-sans text-gray-700">
-                      <p className="text-lg font-semibold">Загружен PDF-документ с подписью сотрудника</p>
-                      <p className="text-sm">{doc.employeeScanFileName ?? "scan.pdf"}</p>
-                      <a className="text-blue-700 underline" href={doc.employeeScanDataUrl} target="_blank" rel="noreferrer">
-                        Открыть PDF
-                      </a>
+              <Card className="bg-white text-black p-4 sm:p-6 shadow-xl border border-gray-200 official-document print:shadow-none print:border-none">
+                <div className="mx-auto w-full max-w-[794px]">
+                  <div className="mb-4 flex flex-col gap-2 font-sans text-sm text-gray-600 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-semibold text-gray-900">{doc.title}</p>
+                      <p>Документ для подписи директора № {doc.number}</p>
+                      {doc.employeeSignedAt && (
+                        <p className="text-xs">Скан загружен: {formatDate(doc.employeeSignedAt)}</p>
+                      )}
                     </div>
-                  )}
-                </div>
-
-                <div className="pt-8 mt-8 border-t border-gray-300">
-                  <p className="font-bold mb-6">ПОДПИСЬ ДИРЕКТОРА:</p>
-                  <div className="border-b border-black mb-2 h-16 flex items-end justify-center">
-                    {doc.status === "signed" && (
-                      signatureImage ? (
-                        <img src={signatureImage} alt="Подпись директора" className="max-h-14 max-w-[220px] object-contain" />
-                      ) : (
-                        <span className="italic px-2 text-base">{signatureName || DEFAULT_SIGNATURE_NAME}</span>
-                      )
+                    {employeeScanObjectUrl && (
+                      <a className="text-blue-700 underline" href={employeeScanObjectUrl} target="_blank" rel="noreferrer">
+                        Открыть файл
+                      </a>
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 text-center">{signatureName || DEFAULT_SIGNATURE_NAME} / подпись</p>
-                  {doc.status === "signed" && doc.signedAt && (
-                    <p className="text-xs text-gray-500 text-center mt-1">Дата подписи директора: {formatDate(doc.signedAt)}</p>
-                  )}
+
+                  <div className="relative aspect-[210/297] w-full overflow-hidden rounded border border-gray-300 bg-gray-50">
+                    {doc.employeeScanDataUrl.startsWith("data:image/") ? (
+                      <img
+                        src={doc.employeeScanDataUrl}
+                        alt="Документ с подписью сотрудника"
+                        className="h-full w-full object-contain"
+                      />
+                    ) : employeeScanObjectUrl ? (
+                      <iframe
+                        title={doc.employeeScanFileName ?? "scan.pdf"}
+                        src={employeeScanObjectUrl}
+                        className="h-full w-full border-0"
+                      />
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center font-sans text-gray-700">
+                        <p className="text-base font-semibold">PDF не удалось отобразить</p>
+                        <p className="text-sm">{doc.employeeScanFileName ?? "scan.pdf"}</p>
+                      </div>
+                    )}
+
+                    {doc.status === "signed" && (
+                      <div className="absolute bottom-4 right-4 max-w-[46%] rounded border border-black/40 bg-white/90 px-4 py-3 text-center font-sans text-xs shadow-sm">
+                        <p className="mb-2 font-semibold text-gray-900">Подписано директором</p>
+                        {signatureImage ? (
+                          <img src={signatureImage} alt="Подпись директора" className="mx-auto max-h-12 max-w-[180px] object-contain" />
+                        ) : (
+                          <p className="italic">{signatureName || DEFAULT_SIGNATURE_NAME}</p>
+                        )}
+                        {doc.signedAt && (
+                          <p className="mt-1 text-[10px] text-gray-600">{formatDate(doc.signedAt)}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Card>
             )}
@@ -358,20 +390,18 @@ export default function DocumentView() {
               <div className="space-y-4 text-sm">
                 {doc.employeeScanDataUrl ? (
                   <>
-                    <div className="rounded-md border border-border/60 bg-white p-3">
-                      {doc.employeeScanDataUrl.startsWith("data:image/") ? (
-                        <img src={doc.employeeScanDataUrl} alt="Скан документа с подписью сотрудника" className="mx-auto max-h-48 object-contain" />
-                      ) : (
-                        <p className="text-center text-muted-foreground">Загружен файл: {doc.employeeScanFileName ?? "скан документа"}</p>
+                    <div className="rounded-md border border-border/60 bg-muted/30 p-3 text-xs text-muted-foreground">
+                      <p className="font-medium text-foreground">{doc.employeeScanFileName ?? "scan.pdf"}</p>
+                      {doc.employeeSignedAt && (
+                        <p className="mt-1">Скан загружен: {formatDate(doc.employeeSignedAt)}</p>
                       )}
                     </div>
-                    <Button asChild variant="outline" size="sm" className="w-full">
-                      <a href={doc.employeeScanDataUrl} target="_blank" rel="noreferrer">
-                        Открыть скан
-                      </a>
-                    </Button>
-                    {doc.employeeSignedAt && (
-                      <p className="text-xs text-muted-foreground">Скан загружен: {formatDate(doc.employeeSignedAt)}</p>
+                    {employeeScanObjectUrl && (
+                      <Button asChild variant="outline" size="sm" className="w-full">
+                        <a href={employeeScanObjectUrl} target="_blank" rel="noreferrer">
+                          Открыть файл
+                        </a>
+                      </Button>
                     )}
                   </>
                 ) : (
