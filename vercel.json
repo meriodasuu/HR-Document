@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "pnpm install --frozen-lockfile --config.dangerously-allow-all-builds=true",
+  "buildCommand": "pnpm --filter @workspace/hr-docs run build",
+  "outputDirectory": "artifacts/hr-docs/dist/public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
