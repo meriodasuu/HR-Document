@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "installCommand": "pnpm install --frozen-lockfile --config.dangerously-allow-all-builds=true",
-  "buildCommand": "pnpm --filter @workspace/hr-docs run build && node ./scripts/copy-hr-docs-public.mjs",
+  "buildCommand": "pnpm --filter @workspace/hr-docs run build && mkdir -p public && cp -R artifacts/hr-docs/dist/public/. public/",
   "outputDirectory": "public",
   "rewrites": [
     {
