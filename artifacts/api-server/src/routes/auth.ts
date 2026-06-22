@@ -1,9 +1,9 @@
-import { Router, type IRouter } from "express";
+import { Router, type Request, type Response } from "express";
 import { checkCredentials, createSession, destroySession, validateSession } from "../lib/auth";
 
-const router: IRouter = Router();
+const router = Router();
 
-router.post("/login", (req, res) => {
+router.post("/login", (req: Request, res: Response) => {
   const { username, password } = req.body ?? {};
   if (!username || !password) {
     return res.status(400).json({ error: "Укажите имя пользователя и пароль" });
@@ -16,7 +16,7 @@ router.post("/login", (req, res) => {
   res.json({ token, username: user.username, role: user.role });
 });
 
-router.post("/logout", (req, res) => {
+router.post("/logout", (req: Request, res: Response) => {
   const authHeader = req.headers["authorization"];
   if (authHeader?.startsWith("Bearer ")) {
     destroySession(authHeader.slice(7));
@@ -24,7 +24,7 @@ router.post("/logout", (req, res) => {
   res.json({ success: true });
 });
 
-router.get("/me", (req, res) => {
+router.get("/me", (req: Request, res: Response) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader?.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Не авторизован" });

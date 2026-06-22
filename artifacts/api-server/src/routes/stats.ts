@@ -1,11 +1,11 @@
-import { Router, type IRouter } from "express";
+import { Router, type Request, type Response } from "express";
 import { db, documentsTable, employeesTable } from "@workspace/db";
 import { eq, sql, and, gte } from "drizzle-orm";
 import { demoStore } from "../lib/demo-store";
 
-const router: IRouter = Router();
+const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (_req: Request, res: Response) => {
   const now = new Date();
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 

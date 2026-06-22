@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type Request, type Response } from "express";
 import { db, employeesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@workspace/api-zod";
 import { demoStore } from "../lib/demo-store";
 
-const router: IRouter = Router();
+const router = Router();
 
 function serializeEmployee(employee: {
   salary?: string | number | null;
@@ -30,7 +30,7 @@ function toDbEmployeeInput(body: ReturnType<typeof CreateEmployeeBody.parse>) {
   };
 }
 
-router.get("/", async (req, res) => {
+router.get("/", async (_req: Request, res: Response) => {
   if (demoStore.isEnabled) {
     return res.json(demoStore.listEmployees().map(serializeEmployee));
   }
@@ -41,7 +41,7 @@ router.get("/", async (req, res) => {
   res.json(employees.map(serializeEmployee));
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: Request, res: Response) => {
   const body = CreateEmployeeBody.parse(req.body);
 
   if (demoStore.isEnabled) {
@@ -54,7 +54,7 @@ router.post("/", async (req, res) => {
   res.status(201).json(serializeEmployee(employee));
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: Request, res: Response) => {
   const { id } = GetEmployeeParams.parse({ id: Number(req.params.id) });
 
   if (demoStore.isEnabled) {
@@ -70,7 +70,7 @@ router.get("/:id", async (req, res) => {
   res.json(serializeEmployee(employee));
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req: Request, res: Response) => {
   const { id } = UpdateEmployeeParams.parse({ id: Number(req.params.id) });
   const body = UpdateEmployeeBody.parse(req.body);
 
@@ -87,7 +87,7 @@ router.put("/:id", async (req, res) => {
   res.json(serializeEmployee(employee));
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: Request, res: Response) => {
   const { id } = DeleteEmployeeParams.parse({ id: Number(req.params.id) });
 
   if (demoStore.isEnabled) {

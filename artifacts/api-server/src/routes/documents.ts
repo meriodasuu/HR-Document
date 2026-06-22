@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type Request, type Response } from "express";
 import { db, documentsTable, employeesTable } from "@workspace/db";
 import { eq, and, sql } from "drizzle-orm";
 import {
@@ -12,7 +12,7 @@ import { STATIC_TEMPLATES } from "./templates";
 import { customTemplatesTable } from "@workspace/db";
 import { demoStore, type DemoDocument } from "../lib/demo-store";
 
-const router: IRouter = Router();
+const router = Router();
 
 function fillTemplate(content: string, fields: Record<string, string>, employee: { fullName: string; position: string; department: string }): string {
   let result = content
@@ -55,11 +55,11 @@ function serializeDocument<T extends { signedAt?: Date | null; employeeSignedAt?
   };
 }
 
-function getUserRole(req: { user?: { role?: string } }) {
+function getUserRole(req: Request & { user?: { role?: string } }) {
   return req.user?.role;
 }
 
-router.get("/", async (req, res) => {
+router.get("/", async (req: Request, res: Response) => {
   const query = GetDocumentsQueryParams.parse(req.query);
 
   if (demoStore.isEnabled) {
@@ -100,7 +100,7 @@ router.get("/", async (req, res) => {
   res.json(result);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: Request, res: Response) => {
   const body = CreateDocumentBody.parse(req.body);
 
   let template: { name: string; type: string; content: string } | undefined;
@@ -179,7 +179,7 @@ router.post("/", async (req, res) => {
   });
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: Request, res: Response) => {
   const { id } = GetDocumentParams.parse({ id: Number(req.params.id) });
 
   if (demoStore.isEnabled) {
@@ -210,7 +210,7 @@ router.get("/:id", async (req, res) => {
   });
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: Request, res: Response) => {
   const { id } = DeleteDocumentParams.parse({ id: Number(req.params.id) });
 
   if (demoStore.isEnabled) {
@@ -224,8 +224,8 @@ router.delete("/:id", async (req, res) => {
   res.json({ success: true, message: "Document deleted" });
 });
 
-router.post("/:id/send-signature", async (req, res) => {
-  if (getUserRole(req as any) !== "hr") {
+router.post("/:id/send-signature", async (req: Request, res: Response) => {
+  if (getUserRole(req) !== "hr") {
     return res.status(403).json({ error: "Only HR can send documents for signature" });
   }
 
@@ -234,8 +234,8 @@ router.post("/:id/send-signature", async (req, res) => {
   });
 });
 
-router.post("/:id/employee-scan", async (req, res) => {
-  if (getUserRole(req as any) !== "hr") {
+router.post("/:id/employee-scan", async (req: Request, res: Response) => {
+  if (getUserRole(req) !== "hr") {
     return res.status(403).json({ error: "Only HR can upload employee signed scans" });
   }
 
@@ -286,8 +286,8 @@ router.post("/:id/employee-scan", async (req, res) => {
   res.json(serializeDocument(doc, employee?.fullName ?? ""));
 });
 
-router.post("/:id/sign", async (req, res) => {
-  if (getUserRole(req as any) !== "director") {
+router.post("/:id/sign", async (req: Request, res: Response) => {
+  if (getUserRole(req) !== "director") {
     return res.status(403).json({ error: "Only director can sign documents" });
   }
 

@@ -1,9 +1,9 @@
-import { Router, type IRouter } from "express";
+import { Router, type Request, type Response } from "express";
 import { db, customTemplatesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { demoStore } from "../lib/demo-store";
 
-const router: IRouter = Router();
+const router = Router();
 
 export const STATIC_TEMPLATES = [
   {
@@ -187,7 +187,7 @@ export const STATIC_TEMPLATES = [
   },
 ];
 
-router.get("/", async (_req, res) => {
+router.get("/", async (_req: Request, res: Response) => {
   if (demoStore.isEnabled) {
     const custom = demoStore.listCustomTemplates().map((r) => ({
       id: r.id + 1000,
@@ -218,7 +218,7 @@ router.get("/", async (_req, res) => {
   res.json([...STATIC_TEMPLATES, ...custom]);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req: Request, res: Response) => {
   const { name, description, content } = req.body ?? {};
   if (!name || !content) {
     return res.status(400).json({ error: "Укажите название и содержимое шаблона" });
@@ -282,7 +282,7 @@ router.post("/", async (req, res) => {
   });
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: Request, res: Response) => {
   const dbId = Number(req.params.id) - 1000;
   if (dbId < 1) {
     return res.status(400).json({ error: "Нельзя удалить встроенный шаблон" });
