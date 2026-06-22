@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1280" height="760" viewBox="0 0 1280 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Рисунок 14 - Структура таблиц базы данных</title>
+  <rect width="1280" height="760" fill="#F8FAFC"/>
+  <text x="640" y="58" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#0F172A" text-anchor="middle">Структура таблиц базы данных</text>
+  <text x="640" y="92" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#64748B" text-anchor="middle">Основные сущности: сотрудники, документы и пользовательские шаблоны</text>
+
+  <rect x="95" y="150" width="310" height="430" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="95" y="150" width="310" height="58" rx="12" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="250" y="187" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#1D4ED8" text-anchor="middle">employees</text>
+  <text x="122" y="242" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">id</text>
+  <text x="265" y="242" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">serial, PK</text>
+  <text x="122" y="282" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">full_name</text>
+  <text x="265" y="282" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="122" y="322" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">position</text>
+  <text x="265" y="322" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="122" y="362" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">department</text>
+  <text x="265" y="362" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="122" y="402" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">employee_number</text>
+  <text x="265" y="402" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text, unique</text>
+  <text x="122" y="442" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">hire_date</text>
+  <text x="265" y="442" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="122" y="482" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">salary</text>
+  <text x="265" y="482" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">numeric</text>
+  <text x="122" y="522" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">created_at</text>
+  <text x="265" y="522" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">timestamp</text>
+
+  <rect x="485" y="150" width="310" height="430" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="485" y="150" width="310" height="58" rx="12" fill="#F0FDF4" stroke="#BBF7D0"/>
+  <text x="640" y="187" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#15803D" text-anchor="middle">documents</text>
+  <text x="512" y="242" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">id</text>
+  <text x="660" y="242" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">serial, PK</text>
+  <text x="512" y="282" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">number</text>
+  <text x="660" y="282" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text, unique</text>
+  <text x="512" y="322" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">type</text>
+  <text x="660" y="322" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="512" y="362" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">title</text>
+  <text x="660" y="362" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="512" y="402" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">status</text>
+  <text x="660" y="402" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="512" y="442" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">employee_id</text>
+  <text x="660" y="442" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">integer, FK</text>
+  <text x="512" y="482" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">content</text>
+  <text x="660" y="482" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="512" y="522" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">signed_at</text>
+  <text x="660" y="522" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">timestamp</text>
+
+  <rect x="875" y="150" width="310" height="430" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="875" y="150" width="310" height="58" rx="12" fill="#FAF5FF" stroke="#E9D5FF"/>
+  <text x="1030" y="187" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#7E22CE" text-anchor="middle">custom_templates</text>
+  <text x="902" y="242" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">id</text>
+  <text x="1052" y="242" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">serial, PK</text>
+  <text x="902" y="282" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">name</text>
+  <text x="1052" y="282" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="902" y="322" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">type</text>
+  <text x="1052" y="322" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="902" y="362" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">description</text>
+  <text x="1052" y="362" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="902" y="402" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">fields</text>
+  <text x="1052" y="402" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">jsonb</text>
+  <text x="902" y="442" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">content</text>
+  <text x="1052" y="442" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">text</text>
+  <text x="902" y="482" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F172A">created_at</text>
+  <text x="1052" y="482" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#64748B">timestamp</text>
+
+  <path d="M485 442 H410" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M424 428 L405 442 L424 456" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="445" y="420" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#15803D" text-anchor="middle">FK</text>
+
+  <rect x="245" y="635" width="790" height="64" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="640" y="675" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#475569" text-anchor="middle">Один сотрудник может иметь несколько документов; документы хранят ссылку на сотрудника через employee_id</text>
+</svg>

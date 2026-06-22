@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Рисунок 13 - Схема хранения данных системы</title>
+  <rect width="1280" height="720" fill="#F8FAFC"/>
+  <text x="640" y="58" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#0F172A" text-anchor="middle">Схема хранения данных системы</text>
+  <text x="640" y="92" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#64748B" text-anchor="middle">Клиентская часть обращается к API, сервер сохраняет данные в PostgreSQL</text>
+
+  <rect x="90" y="190" width="270" height="170" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="120" y="220" width="210" height="80" rx="10" fill="#EFF6FF" stroke="#BFDBFE"/>
+  <text x="225" y="256" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#1D4ED8" text-anchor="middle">Frontend</text>
+  <text x="225" y="284" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#475569" text-anchor="middle">React + Vite</text>
+  <text x="225" y="334" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#334155" text-anchor="middle">Интерфейс HR и директора</text>
+
+  <rect x="505" y="190" width="270" height="170" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="535" y="220" width="210" height="80" rx="10" fill="#F0FDF4" stroke="#BBF7D0"/>
+  <text x="640" y="256" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#15803D" text-anchor="middle">API-сервер</text>
+  <text x="640" y="284" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#475569" text-anchor="middle">Node.js + Express</text>
+  <text x="640" y="334" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#334155" text-anchor="middle">Авторизация и бизнес-логика</text>
+
+  <rect x="920" y="190" width="270" height="170" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="950" y="220" width="210" height="80" rx="10" fill="#FAF5FF" stroke="#E9D5FF"/>
+  <text x="1055" y="256" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#7E22CE" text-anchor="middle">PostgreSQL</text>
+  <text x="1055" y="284" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#475569" text-anchor="middle">Облачная БД Render</text>
+  <text x="1055" y="334" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#334155" text-anchor="middle">Постоянное хранение данных</text>
+
+  <path d="M365 275 H495" stroke="#2563EB" stroke-width="4" stroke-linecap="round"/>
+  <path d="M485 260 L505 275 L485 290" stroke="#2563EB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="430" y="252" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#475569" text-anchor="middle">HTTP-запросы</text>
+
+  <path d="M780 275 H910" stroke="#16A34A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M900 260 L920 275 L900 290" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="845" y="252" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#475569" text-anchor="middle">SQL-запросы</text>
+
+  <rect x="170" y="455" width="940" height="120" rx="14" fill="#FFFFFF" stroke="#CBD5E1"/>
+  <text x="640" y="495" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="800" fill="#0F172A" text-anchor="middle">Автоматическая подготовка структуры БД</text>
+  <text x="640" y="532" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#475569" text-anchor="middle">При запуске API проверяет наличие DATABASE_URL и создает таблицы employees, documents, custom_templates</text>
+  <text x="640" y="562" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#475569" text-anchor="middle">Если DATABASE_URL не задан, приложение переходит в демонстрационный режим с временным хранением данных</text>
+</svg>

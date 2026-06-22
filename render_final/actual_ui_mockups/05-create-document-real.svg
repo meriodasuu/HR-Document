@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1440" height="960" viewBox="0 0 1440 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Реальный макет: создание документа</title>
+  <rect width="1440" height="960" fill="#f8fafc"/>
+  
+    
+    <rect x="0" y="0" width="260" height="960" fill="#ffffff"/>
+    <line x1="260" y1="0" x2="260" y2="960" stroke="#e2e8f0"/>
+    <rect x="18" y="22" width="40" height="40" rx="12" fill="#eff6ff" stroke="#bfdbfe"/><path d="M38 34 L48 39 V49 C48 56 42 59 38 61 C34 59 28 56 28 49 V39 L38 34Z" stroke="#2563eb" stroke-width="2.5" fill="none"/>
+    <text x="70" y="46" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="800" fill="#0f172a" text-anchor="start">HR Docs</text>
+    <text x="70" y="64" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" font-weight="700" fill="#64748b" text-anchor="start">СИСТЕМА АВТОМАТИЗАЦИИ</text>
+    <text x="18" y="118" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="700" fill="#94a3b8" text-anchor="start">УПРАВЛЕНИЕ</text>
+    
+      <rect x="14" y="130" width="232" height="44" rx="8" fill="#ffffff" stroke="#ffffff"/>
+      <circle cx="38" cy="152" r="7" fill="#94a3b8"/>
+      <text x="58" y="157" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#64748b" text-anchor="start">Главная</text>
+    
+      <rect x="14" y="180" width="232" height="44" rx="8" fill="#ffffff" stroke="#ffffff"/>
+      <circle cx="38" cy="202" r="7" fill="#94a3b8"/>
+      <text x="58" y="207" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#64748b" text-anchor="start">Сотрудники</text>
+    
+      <rect x="14" y="230" width="232" height="44" rx="8" fill="#ffffff" stroke="#ffffff"/>
+      <circle cx="38" cy="252" r="7" fill="#94a3b8"/>
+      <text x="58" y="257" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#64748b" text-anchor="start">Документы</text>
+    
+      <rect x="14" y="280" width="232" height="44" rx="8" fill="#eff6ff" stroke="#dbeafe"/>
+      <circle cx="38" cy="302" r="7" fill="#2563eb"/>
+      <text x="58" y="307" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#2563eb" text-anchor="start">Создать документ</text>
+    
+      <rect x="14" y="330" width="232" height="44" rx="8" fill="#ffffff" stroke="#ffffff"/>
+      <circle cx="38" cy="352" r="7" fill="#94a3b8"/>
+      <text x="58" y="357" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#64748b" text-anchor="start">Шаблоны</text>
+    
+    <line x1="0" y1="842" x2="260" y2="842" stroke="#e2e8f0"/>
+    <circle cx="36" cy="884" r="17" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="36" y="890" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" fill="#2563eb" text-anchor="middle">hr</text>
+    <text x="64" y="878" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#0f172a" text-anchor="start">hr</text>
+    <text x="64" y="899" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="400" fill="#64748b" text-anchor="start">HR-сотрудник</text>
+  
+    <g transform="translate(260 0)">
+      <circle cx="590" cy="84" r="32" fill="#eff6ff" stroke="#bfdbfe"/>
+      <text x="590" y="146" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#0f172a" text-anchor="middle">Создание документа</text>
+      <text x="590" y="176" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#64748b" text-anchor="middle">Мастер формирования нового документа по шаблону</text>
+      <circle cx="404" cy="250" r="20" fill="#2563eb"/><circle cx="590" cy="250" r="20" fill="#eff6ff" stroke="#2563eb"/><circle cx="776" cy="250" r="20" fill="#ffffff" stroke="#dbe3ee"/>
+      <line x1="424" y1="250" x2="570" y2="250" stroke="#93c5fd"/><line x1="610" y1="250" x2="756" y2="250" stroke="#e2e8f0"/>
+      <text x="404" y="286" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#0f172a" text-anchor="middle">Шаблон</text><text x="590" y="286" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#0f172a" text-anchor="middle">Сотрудник</text><text x="776" y="286" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#64748b" text-anchor="middle">Данные</text>
+      <rect x="240" y="330" width="700" height="410" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="280" y="382" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" fill="#0f172a" text-anchor="start">Выберите тип документа</text>
+      <line x1="280" y1="404" x2="900" y2="404" stroke="#e2e8f0"/>
+      <rect x="280" y="438" width="292" height="110" rx="12" fill="#eff6ff" stroke="#93c5fd"/>
+      <text x="344" y="478" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a" text-anchor="start">Приказ о приеме</text>
+      <text x="344" y="506" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#64748b" text-anchor="start">Создание кадрового приказа</text>
+      <rect x="596" y="438" width="292" height="110" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+      <text x="660" y="478" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a" text-anchor="start">Трудовой договор</text>
+      <text x="660" y="506" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#64748b" text-anchor="start">Формирование договора</text>
+      <rect x="760" y="650" width="128" height="40" rx="8" fill="#2563eb" stroke="#2563eb"/><text x="824" y="676" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">Далее</text>
+    </g>
+  
+</svg>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1440" height="960" viewBox="0 0 1440 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Просмотр документа</title>
+  <rect width="1440" height="960" fill="#F5F7FA"/>
+  
+    
+    <rect x="0" y="0" width="260" height="960" fill="#FFFFFF"/>
+    <line x1="260" y1="0" x2="260" y2="960" stroke="#E0E6EF"/>
+    <rect x="28" y="34" width="46" height="46" rx="10" fill="#EAF1FF" stroke="#BDD0FF"/>
+    <path d="M52 46 L63 51 V61 C63 68 57 72 52 74 C47 72 41 68 41 61 V51 L52 46Z" stroke="#2563EB" stroke-width="3" fill="none"/>
+    <text x="86" y="56" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#172033" text-anchor="start">HR Docs</text>
+    <text x="86" y="78" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#6A7890" text-anchor="start">HR</text>
+    <rect x="24" y="158" width="212" height="44" rx="6" fill="#FFFFFF" stroke="#FFFFFF"/>
+      <circle cx="48" cy="180" r="8" fill="#A7B4C6"/>
+      <text x="68" y="186" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="500" fill="#526174" text-anchor="start">Главная</text>
+<rect x="24" y="212" width="212" height="44" rx="6" fill="#FFFFFF" stroke="#FFFFFF"/>
+      <circle cx="48" cy="234" r="8" fill="#A7B4C6"/>
+      <text x="68" y="240" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="500" fill="#526174" text-anchor="start">Сотрудники</text>
+<rect x="24" y="266" width="212" height="44" rx="6" fill="#EAF1FF" stroke="#BDD0FF"/>
+      <circle cx="48" cy="288" r="8" fill="#2563EB"/>
+      <text x="68" y="294" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#1D4ED8" text-anchor="start">Документы</text>
+<rect x="24" y="320" width="212" height="44" rx="6" fill="#FFFFFF" stroke="#FFFFFF"/>
+      <circle cx="48" cy="342" r="8" fill="#A7B4C6"/>
+      <text x="68" y="348" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="500" fill="#526174" text-anchor="start">Шаблоны</text>
+    <rect x="24" y="850" width="212" height="70" rx="8" fill="#F7F9FC" stroke="#E4EAF2"/>
+    <text x="46" y="880" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#172033" text-anchor="start">hr</text>
+    <text x="46" y="904" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="400" fill="#6A7890" text-anchor="start">HR-отдел</text>
+  
+    
+    <text x="304" y="60" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" font-weight="800" fill="#172033" text-anchor="start">Просмотр документа</text>
+    <text x="304" y="88" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="400" fill="#66758B" text-anchor="start">Проверка документа перед отправкой на подпись</text>
+    <rect x="1096" y="34" width="248" height="44" rx="22" fill="#FFFFFF" stroke="#DCE4EF"/>
+    <circle cx="1120" cy="56" r="8" fill="#9AA8BA"/>
+    <text x="1140" y="62" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="400" fill="#7B8797" text-anchor="start">Поиск по документам</text>
+  
+    <rect x="304" y="118" width="760" height="760" rx="8" fill="#FFFFFF" stroke="#DDE4EE"/>
+    <rect x="372" y="160" width="624" height="660" rx="4" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="684" y="218" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" fill="#172033" text-anchor="middle">ТРУДОВОЙ ДОГОВОР</text>
+    <text x="420" y="276" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#172033" text-anchor="start">г. Вологда</text>
+    <text x="860" y="276" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#172033" text-anchor="start">15.06.2026</text>
+    <line x1="420" y1="330" x2="948" y2="330" stroke="#D7DEE8"/>
+    <line x1="420" y1="364" x2="948" y2="364" stroke="#D7DEE8"/>
+    <line x1="420" y1="398" x2="948" y2="398" stroke="#D7DEE8"/>
+    <line x1="420" y1="432" x2="948" y2="432" stroke="#D7DEE8"/>
+    <line x1="420" y1="496" x2="948" y2="496" stroke="#D7DEE8"/>
+    <line x1="420" y1="530" x2="948" y2="530" stroke="#D7DEE8"/>
+    <line x1="420" y1="594" x2="948" y2="594" stroke="#D7DEE8"/>
+    <text x="420" y="690" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#172033" text-anchor="start">Работодатель</text>
+    <text x="760" y="690" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#172033" text-anchor="start">Работник</text>
+    <line x1="420" y1="734" x2="620" y2="734" stroke="#94A3B8"/>
+    <line x1="760" y1="734" x2="948" y2="734" stroke="#94A3B8"/>
+    <rect x="1100" y="118" width="244" height="282" rx="8" fill="#FFFFFF" stroke="#DDE4EE"/>
+    <text x="1126" y="158" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="800" fill="#172033" text-anchor="start">Состояние</text>
+    <rect x="1126" y="184" width="154" height="28" rx="14" fill="#FEF3C7" stroke="none"/><text x="1203" y="203" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="600" fill="#B45309" text-anchor="middle">На подписи</text>
+    <text x="1126" y="244" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#66758B" text-anchor="start">Документ отправлен директору</text>
+    <rect x="1126" y="314" width="170" height="42" rx="6" fill="#FFFFFF" stroke="#D6DEE9"/><text x="1211" y="341" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#2D3B50" text-anchor="middle">Скачать</text>
+    <rect x="1100" y="430" width="244" height="210" rx="8" fill="#FFFFFF" stroke="#DDE4EE"/>
+    <text x="1126" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" font-weight="800" fill="#172033" text-anchor="start">История</text>
+    <text x="1126" y="512" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#526174" text-anchor="start">15.06 10:25 создан</text>
+    <text x="1126" y="544" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" font-weight="500" fill="#526174" text-anchor="start">15.06 10:31 отправлен</text>
+  
+</svg>
