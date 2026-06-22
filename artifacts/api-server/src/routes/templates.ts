@@ -227,7 +227,7 @@ router.post("/", async (req: Request, res: Response) => {
   // Auto-detect {{placeholder}} fields from content
   const placeholderRegex = /\{\{(\w+)\}\}/g;
   const found = new Set<string>();
-  let m;
+  let m: RegExpExecArray | null;
   while ((m = placeholderRegex.exec(content)) !== null) {
     const key = m[1];
     if (!["employeeName", "position", "department"].includes(key)) {

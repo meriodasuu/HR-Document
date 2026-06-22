@@ -25,7 +25,7 @@ function fillTemplate(content: string, fields: Record<string, string>, employee:
   }
 
   // Handle optional blocks {{#key}}...{{/key}}
-  result = result.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_, key, block) => {
+  result = result.replace(/\{\{#(\w+)\}\}([\s\S]*?)\{\{\/\1\}\}/g, (_match: string, key: string, block: string) => {
     return fields[key] ? block.replace(new RegExp(`\\{\\{${key}\\}\\}`, "g"), fields[key]) : "";
   });
 

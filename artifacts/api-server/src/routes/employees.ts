@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { db, employeesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import {
   CreateEmployeeBody,
   GetEmployeeParams,
@@ -12,18 +13,35 @@ import { demoStore } from "../lib/demo-store";
 
 const router = Router();
 
-function serializeEmployee(employee: {
+type EmployeeInput = z.infer<typeof CreateEmployeeBody>;
+
+type EmployeeLike = {
+  id: number;
+  fullName: string;
+  position: string;
+  department: string;
+  employeeNumber: string;
+  hireDate: string;
   salary?: string | number | null;
+  phone?: string | null;
+  email?: string | null;
   createdAt: Date;
-}) {
+};
+
+type EmployeeResponse = Omit<EmployeeLike, "salary" | "createdAt"> & {
+  salary?: number;
+  createdAt: string;
+};
+
+function serializeEmployee(employee: EmployeeLike): EmployeeResponse {
   return {
     ...employee,
-    salary: employee.salary ? Number(employee.salary) : undefined,
+    salary: employee.salary === undefined || employee.salary === null ? undefined : Number(employee.salary),
     createdAt: employee.createdAt.toISOString(),
   };
 }
 
-function toDbEmployeeInput(body: ReturnType<typeof CreateEmployeeBody.parse>) {
+function toDbEmployeeInput(body: EmployeeInput) {
   return {
     ...body,
     salary: body.salary === undefined ? undefined : String(body.salary),
