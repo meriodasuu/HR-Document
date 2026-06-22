@@ -1,7 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { db, employeesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 import {
   CreateEmployeeBody,
   GetEmployeeParams,
@@ -13,7 +12,16 @@ import { demoStore } from "../lib/demo-store";
 
 const router = Router();
 
-type EmployeeInput = z.infer<typeof CreateEmployeeBody>;
+type EmployeeInput = {
+  fullName: string;
+  position: string;
+  department: string;
+  employeeNumber: string;
+  hireDate: string;
+  salary?: number;
+  phone?: string;
+  email?: string;
+};
 
 type EmployeeLike = {
   id: number;
